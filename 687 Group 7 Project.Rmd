@@ -1,0 +1,15 @@
+---
+title: "687 Group 7 Project"
+author: "Mi Huynh"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r}
+install.packages("readr")
+library(readr)
+```
+
+```{r}
+anes_mergedfile_2016_2020_2024panel_20260519_3 <- read_csv("~/Library/Mobile Documents/com~apple~CloudDocs/Michigan Program in Survey and Data Science/FA 2026/SURVMETH 687- Applications of Statistical Modeling/Survmeth 687- Group 7 Project/anes_mergedfile_2016-2020-2024panel_20260519 3.csv")
+```
