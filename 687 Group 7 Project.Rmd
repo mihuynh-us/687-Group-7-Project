@@ -59,5 +59,5 @@ library(haven)
 ```{r}
 anes_mergedfile_2016_2020_2024 <- read_sav("~/Downloads/anes_mergedfile_2016-2020-2024panel_20260519.sav")
 anes_cleaned <- anes_mergedfile_2016_2020_2024 %>% select(contains(c("V240106a", "V240106b", "V162079", "V200011a", "V202144", "V242126", "V201200", "V160001", "V160001_orig", "241177", "V162171", "V202064", "V162292a", "V168307", "V245005", "V162291", "V202637","V241501x", "V201549x", "V168311", "V168312", "V168313", "V168314", "V168315", "V168316", "V203000", "V243002", "V203000", "V161010d", "V160202", "V200011c", "V240106c")))
-write_csv(anes_cleaned, file = "anes_cleaned_0929.csv")
+write_csv(anes_cleaned, file = "anes_cleaned_0929.sav")
 ```
