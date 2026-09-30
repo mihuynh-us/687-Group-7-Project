@@ -1,0 +1,89 @@
+---
+title: "687 Group 7 Project"
+author: "Mi Huynh"
+date: "`r Sys.Date()`"
+output: pdf_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+**Codebook:**
+
+**V200011a** - 2016-2020 panel pre-post-election weight V202144
+(0-100) - Feeling thermometer for Republican candidate Trump
+
+**V201200** - PRE: 7PT SCALE LIBERAL-CONSERVATIVE SELFPLACEMENT -9.
+Refused -8. Don’t know 1. Extremely liberal 2. Liberal 3. Slightly
+liberal 4. Moderate; middle of the road 5. Slightly conservative 6.
+Conservative 7. Extremely conservative 99. Haven’t thought much about
+this
+
+**V202064** - POST: Election party of registration -9. Refused -8. Don’t
+know -7. No post-election data, deleted due to incomplete interview -6.
+No post-election interview -1. Inapplicable 1. Democratic party 2.
+Republican party 4. None or ‘independent’ 5. Other party {SPECIFY}
+
+**V202637** - POST: IWR OBS: RESPONDENT’S GENDER -8. Don’t know -7. No
+post-election data, deleted due to incomplete interview -6. No
+post-election interview -5. Interview breakoff (sufficient partial IW)
+-1. Inapplicable 1. Male 2. Female
+
+**V201549x** - PRE: SUMMARY: R SELF-IDENTIFIED RACE/ETHNICITY -9.
+Refused -8. Don’t know 1. White, non-Hispanic 2. Black, non-Hispanic 3.
+Hispanic 4. Asian or Native Hawaiian/other Pacific Islander,
+non-Hispanic alone 5. Native American/Alaska Native or other race,
+non-Hispanic alone 6. Multiple races, non-Hispanic
+
+**V203000** - SAMPLE - FIPS codes 1. Alabama 2. Alaska 4. Arizona 5.
+Arkansas 6. California 8. Colorado 9. Connecticut 10. Delaware 11.
+Washington DC 12. Florida 13. Georgia 15. Hawaii 16. Idaho 17. Illinois
+18. Indiana 19. Iowa 20. Kansas 21. Kentucky 22. Louisiana 23. Maine 24.
+Maryland 25. Massachusetts 26. Michigan 27. Minnesota 28. Mississippi
+29. Missouri 30. Montana 31. Nebraska 32. Nevada 33. New Hampshire 34.
+New Jersey 35. New Mexico 36. New York 37. North Carolina 38. North
+Dakota 39. Ohio 40. Oklahoma 41. Oregon 42. Pennsylvania 44. Rhode
+Island 45. South Carolina 46. South Dakota 47. Tennessee 48. Texas 49.
+Utah 50. Vermont 51. Virginia 53. Washington 54. West Virginia 55.
+Wisconsin 56. Wyoming
+
+```{r, warnings=FALSE, include = FALSE}
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
+install.packages("readr")
+install.packages("haven")
+install.packages("dplyr")
+install.packages("ggplot2")
+library(readr)
+library(dplyr)
+library(haven)
+library(ggplot2)
+```
+
+```{r}
+anes_mergedfile_2016_2020_2024 <- read_sav("~/Downloads/anes_mergedfile_2016-2020-2024panel_20260519.sav")
+anes_cleaned <- anes_mergedfile_2016_2020_2024 %>% select(contains(c("V240106a", "V240106b", "V162079", "V200011a", "V202144", "V242126", "V201200", "V160001", "V160001_orig", "241177", "V162171", "V202064", "V162292a", "V168307", "V245005", "V162291", "V202637","V241501x", "V201549x", "V168311", "V168312", "V168313", "V168314", "V168315", "V168316", "V203000", "V243002", "V203000", "V161010d", "V160202", "V200011c", "V240106c")))
+```
+
+```{r descriptive stats}
+ggplot(data = anes_cleaned) +
+  geom_histogram(mapping = aes(x = V162079)) +
+  labs(title = "2016 Trump Feeling Thermometer") +
+  scale_y_continuous(limits = c(0,300)) +
+  scale_x_continuous(limits = c(0,100))
+ggplot(data = anes_cleaned) +
+  geom_histogram(mapping = aes(x = V202144)) +
+  labs(title = "2020 Trump Feeling Thermometer") +
+  scale_y_continuous(limits = c(0,300)) +
+  scale_x_continuous(limits = c(0,100))
+ggplot(data = anes_cleaned) +
+  geom_histogram(mapping = aes(x = V242126)) +
+  labs(title = "2024 Trump Feeling Thermometer") +  
+  scale_y_continuous(limits = c(0,300)) +
+  scale_x_continuous(limits = c(0,100))
+
+cat("2016 n =",sum(anes_cleaned$V162079 > 0))
+cat("2020 n =", sum(anes_cleaned$V202144 > 0))
+cat("2024 n =", sum(anes_cleaned$V242126 > 0, na.rm = TRUE))
+
+
+```
