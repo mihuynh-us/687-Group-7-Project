@@ -1,6 +1,6 @@
 ---
 title: "687 Group 7 Project"
-author: "Mi Huynh"
+author: "Mi Huynh, Sylvia"
 date: "`r Sys.Date()`"
 output: pdf_document
 editor_options: 
