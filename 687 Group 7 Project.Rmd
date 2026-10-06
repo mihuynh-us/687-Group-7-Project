@@ -91,3 +91,9 @@ cat("2016 observations > 0 =",sum(anes_cleaned$V162079 > 0))
 cat("2020 observations > 0  =", sum(anes_cleaned$V202144 > 0))
 cat("2024 observations > 0  =", sum(anes_cleaned$V242126 > 0, na.rm = TRUE))
 ```
+
+# Zack Descrpitives-
+
+## Boxplot overtime
+
+## Frequency Plot Over Time
