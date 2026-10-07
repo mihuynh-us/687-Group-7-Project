@@ -9,6 +9,9 @@ editor_options:
 ---
 hi
 
+#Descrpitive 
+
+
 **Codebook:**
 
 **V200011a** - 2016-2020 panel pre-post-election weight V202144
@@ -92,9 +95,9 @@ cat("2020 observations > 0  =", sum(anes_cleaned$V202144 > 0))
 cat("2024 observations > 0  =", sum(anes_cleaned$V242126 > 0, na.rm = TRUE))
 ```
 
-# Zack Descrpitives-
+## Zack Descrpitives-
 
-## Boxplot overtime
+### Boxplot overtime
 
 ```{r}
 anes_cleaned_0928->anes
@@ -137,7 +140,7 @@ ggplot(anes_plot, aes(x = year, y = value)) +
 ```
 
 
-## Frequency Plot Over Time
+### Frequency Plot Over Time
 
 ```{r}
 
@@ -173,3 +176,4 @@ ggplot(anes_freq_20, aes(
 
 ```
 
+# Model Specfication and Notation
