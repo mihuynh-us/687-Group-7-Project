@@ -9,7 +9,7 @@ editor_options:
 ---
 hi
 
-#Descrpitive 
+#Descriptives 
 
 
 **Codebook:**
