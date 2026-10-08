@@ -202,5 +202,8 @@ ggplot(anes_freq_20, aes(
   theme_minimal()
 
 ```
+# Cluster + Stratum Combo
+
+
 
 # Model Specfication and Notation
