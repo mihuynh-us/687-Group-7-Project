@@ -68,7 +68,7 @@ library(tidyr)
 ```{r}
 # File
 anes_mergedfile_2016_2020_2024 <- read_sav("~/Downloads/anes_mergedfile_2016-2020-2024panel_20260519.sav")
-anes_cleaned <- anes_mergedfile_2016_2020_2024 %>% select(contains(c("V240106a", "V240106b", "V162079", "V200011a", "V202144", "V242126", "V201200", "V160001", "V160001_orig", "241177", "V162171", "V202064", "V162292a", "V168307", "V245005", "V162291", "V202637","V241501x", "V201549x", "V168311", "V168312", "V168313", "V168314", "V168315", "V168316", "V203000", "V243002", "V203000", "V161010d", "V160202", "V200011c", "V240106c")))
+anes_cleaned <- anes_mergedfile_2016_2020_2024 %>% select(contains(c("V240106a", "V240106b", "V162079", "V200011a", "V202144", "V242126", "V201200", "V160001", "V160001_orig", "241177", "V162171", "V202064", "V162292a", "V168307", "V245005", "V162291", "V202637","V241501x", "V201549x", "V168311", "V168312", "V168313", "V168314", "V168315", "V168316", "V203000", "V243002", "V203000", "V161010d", "V160202", "V200011c", "V240106c","V240107c","V240108c")))
 ```
 ## Mi Descriptives
 
@@ -127,11 +127,10 @@ mean_by_gender_2016; mean_by_gender_2020; mean_by_gender_2024; mean_2016; mean_2
 ### Boxplot overtime
 
 ```{r}
-anes_cleaned_0928->anes
 
 library(tidyverse)
 
-anes_plot <- anes %>%
+anes_plot <- anes_mergedfile_2016_2020_2024 %>%
   mutate(
     V162079 = ifelse(V162079 >= 1 & V162079 <= 100, V162079, NA),
     V202144 = ifelse(V202144 >= 1 & V202144 <= 100, V202144, NA),
