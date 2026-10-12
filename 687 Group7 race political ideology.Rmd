@@ -1,0 +1,350 @@
+---
+title: "race political ideology"
+author: "Yiyang Shu"
+date: "2026-10-07"
+output:
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{fvextra}
+  - \RecustomVerbatimEnvironment{Highlighting}{Verbatim}{breaklines=true,breakanywhere=true,commandchars=\\\{\}}
+---
+
+Extract the data for distribution analysis
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE
+)
+library(tidyverse)
+
+anes_full <- read_csv("ANES_Panel_Full.csv")
+```
+
+```{r}
+anes_distribution <- anes_full %>%
+  select(
+    # Respondent ID
+    V160001,
+    V160001_orig,
+
+    #PRE Party of Registration
+    V161019,   # 2016
+    V201018,   # 2020
+    V241025,   # 2024
+
+    #POST Party of Registration
+    V162030,   # 2016
+    V202064,   # 2020
+    V242064,   # 2024
+
+    #Race / Ethnicity
+    V161310x,  # 2016
+    V201549x,  # 2020
+    V241501x,  # 2024
+
+    #Liberal-Conservative Self-Placement PRE
+    V161126,   # 2016
+    V201200,   # 2020
+    V241177,   # 2024
+
+    #2016 POST ideology
+    V162171
+  )
+```
+
+So the codes we have:
+PRE Party Registration
+2016 - V161019
+2020 - V201018
+2024 - V241025
+
+PRE Race/Ethnicity
+2016 - V161310x
+2020 - V201549x
+2024 - V241501x
+
+PRE Political Ideology / Liberal-Conservative Self-Placement
+2016 - V161126
+2020 - V201200
+2024 - V241177
+
+POST Party Registration
+2016 - V162030
+2020 - V202064
+2024 - V242064
+
+POST Political Ideology / Liberal-Conservative Self-Placement
+2016 - V162171
+2020 - No corresponding repeated POST measure identified
+2024 - No corresponding repeated POST measure identified
+
+```{r}
+#write_csv(
+#  anes_distribution,
+#  "anes_distribution_race_party_liberal.csv"
+#)
+```
+
+```{r}
+#Set Common plot theme
+plot_theme <- theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold")
+  )
+```
+
+```{r}
+#1.Pre Party of Registration
+pre_party_dist <- anes_distribution %>%
+  select(
+    `2016` = V161019,
+    `2020` = V201018,
+    `2024` = V241025
+  ) %>%
+  pivot_longer(
+    everything(),
+    names_to = "year",
+    values_to = "party"
+  ) %>%
+  filter(party %in% c(1, 2, 4, 5)) %>%
+  mutate(
+    year = factor(year, levels = c("2016", "2020", "2024")),
+    party = factor(
+      party,
+      levels = c(1, 2, 4, 5),
+      labels = c(
+        "Democratic Party",
+        "Republican Party",
+        "None / Independent",
+        "Other Party"
+      )
+    )
+  ) %>%
+  count(year, party, name = "n") %>%
+  group_by(year) %>%
+  mutate(percent = n / sum(n) * 100) %>%
+  ungroup()
+
+pre_party_dist
+```
+
+```{r}
+#Draw the plot
+ggplot(
+  pre_party_dist,
+  aes(x = party, y = percent, fill = year)
+) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "PRE Party of Registration Distribution by Year",
+    x = "Party of Registration",
+    y = "Percent",
+    fill = "Year"
+  ) +
+  plot_theme
+```
+
+```{r}
+#2.Race / Ethnicity 
+race_long <- anes_distribution %>%
+  select(
+    `2016` = V161310x,
+    `2020` = V201549x,
+    `2024` = V241501x
+  ) %>%
+  pivot_longer(
+    everything(),
+    names_to = "year",
+    values_to = "race_raw"
+  ) %>%
+  mutate(
+    race = case_when(
+
+      # 2016 coding
+      year == "2016" & race_raw == 1 ~ "White, non-Hispanic",
+      year == "2016" & race_raw == 2 ~ "Black, non-Hispanic",
+      year == "2016" & race_raw == 5 ~ "Hispanic",
+      year == "2016" & race_raw == 3 ~ "Asian/Pacific Islander",
+      year == "2016" & race_raw == 4 ~ "Native American/Other",
+      year == "2016" & race_raw == 6 ~ "Multiple races",
+
+      # 2020 and 2024 coding
+      year %in% c("2020", "2024") & race_raw == 1 ~
+        "White, non-Hispanic",
+
+      year %in% c("2020", "2024") & race_raw == 2 ~
+        "Black, non-Hispanic",
+
+      year %in% c("2020", "2024") & race_raw == 3 ~
+        "Hispanic",
+
+      year %in% c("2020", "2024") & race_raw == 4 ~
+        "Asian/Pacific Islander",
+
+      year %in% c("2020", "2024") & race_raw == 5 ~
+        "Native American/Other",
+
+      year %in% c("2020", "2024") & race_raw == 6 ~
+        "Multiple races",
+
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(race)) %>%
+  mutate(
+    year = factor(
+      year,
+      levels = c("2016", "2020", "2024")
+    ),
+    race = factor(
+      race,
+      levels = c(
+        "White, non-Hispanic",
+        "Black, non-Hispanic",
+        "Hispanic",
+        "Asian/Pacific Islander",
+        "Native American/Other",
+        "Multiple races"
+      )
+    )
+  )
+
+
+race_dist <- race_long %>%
+  count(year, race, name = "n") %>%
+  group_by(year) %>%
+  mutate(
+    percent = n / sum(n) * 100
+  ) %>%
+  ungroup()
+
+race_dist
+```
+
+```{r}
+ggplot(
+  race_dist,
+  aes(x = race, y = percent, fill = year)
+) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "PRE Race/Ethnicity Distribution by Year",
+    x = "Race/Ethnicity",
+    y = "Percent",
+    fill = "Year"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  )
+```
+
+```{r}
+#3. PRE Liberal–Conservative Self-Placement
+pre_ideology_dist <- anes_distribution %>%
+  select(
+    `2016` = V161126,
+    `2020` = V201200,
+    `2024` = V241177
+  ) %>%
+  pivot_longer(
+    everything(),
+    names_to = "year",
+    values_to = "ideology"
+  ) %>%
+  filter(ideology %in% 1:7) %>%
+  mutate(
+    year = factor(year, levels = c("2016", "2020", "2024")),
+    ideology = factor(
+      ideology,
+      levels = 1:7,
+      labels = c(
+        "Extremely liberal",
+        "Liberal",
+        "Slightly liberal",
+        "Moderate",
+        "Slightly conservative",
+        "Conservative",
+        "Extremely conservative"
+      )
+    )
+  ) %>%
+  count(year, ideology, name = "n") %>%
+  group_by(year) %>%
+  mutate(percent = n / sum(n) * 100) %>%
+  ungroup()
+
+pre_ideology_dist
+```
+
+```{r}
+ggplot(
+  pre_ideology_dist,
+  aes(x = ideology, y = percent, fill = year)
+) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "PRE Political Ideology Distribution by Year",
+    x = "Liberal-Conservative Self-Placement",
+    y = "Percent",
+    fill = "Year"
+  ) +
+  plot_theme
+```
+
+```{r}
+#4.POST Party of Registration (this one has many responses missing in 2024)
+post_party_dist <- anes_distribution %>%
+  select(
+    `2016` = V162030,
+    `2020` = V202064,
+    `2024` = V242064
+  ) %>%
+  pivot_longer(
+    everything(),
+    names_to = "year",
+    values_to = "party"
+  ) %>%
+  filter(party %in% c(1, 2, 4, 5)) %>%
+  mutate(
+    year = factor(year, levels = c("2016", "2020", "2024")),
+    party = factor(
+      party,
+      levels = c(1, 2, 4, 5),
+      labels = c(
+        "Democratic Party",
+        "Republican Party",
+        "None / Independent",
+        "Other Party"
+      )
+    )
+  ) %>%
+  count(year, party, name = "n") %>%
+  group_by(year) %>%
+  mutate(percent = n / sum(n) * 100) %>%
+  ungroup()
+
+post_party_dist
+```
+
+```{r}
+ggplot(
+  post_party_dist,
+  aes(x = party, y = percent, fill = year)
+) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "POST Party of Registration Distribution by Year",
+    x = "Party of Registration",
+    y = "Percent",
+    fill = "Year"
+  ) +
+  plot_theme
+```
+
+
+
