@@ -7,9 +7,11 @@ editor_options:
   markdown: 
     wrap: 72
 ---
-hi
+# Research Question
 
-#Descriptives 
+
+
+# Descriptives 
 
 
 **Codebook:**
@@ -202,6 +204,19 @@ ggplot(anes_freq_20, aes(
 
 ```
 # Cluster + Stratum Combo
+
+
+```{r}
+ANES_Panel_Full->ANES
+
+library(dplyr)
+
+ANES <- ANES %>%
+  mutate(cluster = 1000 * (V240108c + V240108d))
+
+ANES$V240108c
+ANES$cluster
+```
 
 
 
