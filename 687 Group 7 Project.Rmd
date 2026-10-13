@@ -9,9 +9,15 @@ editor_options:
 ---
 # Research Question
 
+Opinions of political candidates have long been associated with specific attitudinal and demographic characteristics. Foundational work by Campbell et al. (1960) established party identification as a relatively stable predictor of voter choice and political attitudes. Achen and Bartels (2016), through their group theory of democracy, emphasize the importance of social group identities and demographic characteristics in shaping political preferences. Additionally, work by Fiorina and Abramowitz has examined the relationship between political ideology, partisan identification, and political polarization.
 
+Previous research on political behavior suggests that geographic location and regional political environments are associated with differences in political attitudes and partisan support. Because the ANES sampling design uses geographically based pseudo-clusters and strata, these identifiers provide an opportunity to examine whether Republican presidential candidate feeling thermometer ratings vary across sampling clusters, beyond the variation observed between individual respondents.
 
-# Descriptives 
+Using the 2016–2024 ANES panel, this project will employ a three-level longitudinal model to examine differences in baseline Republican candidate feeling thermometer ratings across clusters and individuals, as well as changes in these ratings across election cycles.
+
+**Research Question:** To what extent do geographically based sampling clusters and individual differences account for variation in Republican presidential candidate feeling thermometer ratings, and how do trajectories of these ratings vary across the 2016, 2020, and 2024 election cycles?
+
+# Descriptive 
 
 
 **Codebook:**
