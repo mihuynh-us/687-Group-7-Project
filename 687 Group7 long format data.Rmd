@@ -1,0 +1,219 @@
+---
+title: "long format dataset"
+author: "Yiyang Shu"
+date: "2026-10-14"
+output: pdf_document
+---
+
+
+```{r}
+# Read full ANES panel data
+library(tidyverse)
+
+anes_panel_full <- read_csv(
+  "ANES_Panel_Full.csv",
+  na = c("", " ", "NA"),
+  show_col_types = FALSE
+)
+```
+
+
+```{r}
+# Select variables needed 
+anes_selected <- anes_panel_full %>%
+  select(
+
+    # Respondent / Case IDs
+    V160001_orig,   # Stable 2016 respondent ID
+    V160001,        # 2016 case ID
+
+    # Sample / interview completion status
+    V160502,        # 2016 pre/post completion
+    V200003,        # 2020 sample type
+    V200004,        # 2020 pre/post completion
+    V240003,        # 2024 sample type
+    V240002c,       # 2024 pre/post completion
+    
+    # PRE Trump Feeling Thermometer
+    V161087,        # 2016
+    V201152,        # 2020
+    V241157,        # 2024
+
+    # POST Trump Feeling Thermometer
+    V162079,        # 2016
+    V202144,        # 2020
+    V242126,        # 2024
+
+    # PRE Party of Registration
+    # Don't use POST here since so many NAs in 2024
+    V161019,        # 2016
+    V201018,        # 2020
+    V241025,        # 2024
+
+    # Race / Ethnicity
+    V161310x,       # 2016
+    V201549x,       # 2020
+    V241501x,       # 2024
+
+    # PRE Liberal-Conservative Self-Placement
+    # Don't use POST here since we only have 2016 data
+    V161126,        # 2016
+    V201200,        # 2020
+    V241177,        # 2024
+
+    # Respondent Gender / Sex
+    V161342,        # 2016
+    V201600,        # 2020
+    V241550,        # 2024
+
+    # State
+    V161010d,       # 2016 FIPS state
+    V203000,        # 2020 FIPS state
+    V243002,        # 2024 FIPS state
+
+    # PRE / POST Weights
+    V160101,        # 2016 PRE weight
+    V160102,        # 2016 POST weight
+
+    V200011a,       # 2020 panel PRE weight
+    V200011b,       # 2020 panel POST weight
+
+    V240106a,       # 2024 panel PRE weight
+    V240106b,       # 2024 panel POST weight
+
+    # PSU / Stratum
+    V160201,        # 2016 Stratum – Full sample 
+    V160202,        # 2016 Variance PSU – full sample 
+
+    V200011c,       # 2020 panel variance unit
+    V200011d,       # 2020 panel variance stratum
+
+    V240106c,       # 2024 panel PSU
+    V240106d        # 2024 panel stratum
+  )
+```
+
+
+```{r}
+# Convert ANES panel from Wide to long format
+
+anes_long <- anes_selected %>%
+
+  # Standardize variable types before reshaping
+  mutate(
+    across(
+      -c(V160001_orig, V160001),
+      ~ suppressWarnings(as.numeric(trimws(as.character(.x))))
+    )
+  ) %>%
+
+  # Rename variables to common names across years
+  rename(
+
+    # Interview completion status
+    completion_status_2016 = V160502,
+    completion_status_2020 = V200004,
+    completion_status_2024 = V240002c,
+
+    # Sample type
+    sample_type_2020 = V200003,
+    sample_type_2024 = V240003,
+
+    # PRE Trump Feeling Thermometer
+    trump_ft_pre_2016 = V161087,
+    trump_ft_pre_2020 = V201152,
+    trump_ft_pre_2024 = V241157,
+
+    # POST Trump Feeling Thermometer
+    trump_ft_post_2016 = V162079,
+    trump_ft_post_2020 = V202144,
+    trump_ft_post_2024 = V242126,
+
+    # PRE Party of Registration
+    party_reg_pre_2016 = V161019,
+    party_reg_pre_2020 = V201018,
+    party_reg_pre_2024 = V241025,
+
+    # Race / Ethnicity
+    race_2016 = V161310x,
+    race_2020 = V201549x,
+    race_2024 = V241501x,
+
+    # PRE Liberal-Conservative Self-Placement
+    ideology_pre_2016 = V161126,
+    ideology_pre_2020 = V201200,
+    ideology_pre_2024 = V241177,
+
+    # Respondent Gender / Sex
+    gender_2016 = V161342,
+    gender_2020 = V201600,
+    gender_2024 = V241550,
+
+    # State
+    state_fips_2016 = V161010d,
+    state_fips_2020 = V203000,
+    state_fips_2024 = V243002,
+
+    # PRE Weights
+    weight_pre_2016 = V160101,
+    weight_pre_2020 = V200011a,
+    weight_pre_2024 = V240106a,
+
+    # POST Weights
+    weight_post_2016 = V160102,
+    weight_post_2020 = V200011b,
+    weight_post_2024 = V240106b,
+
+    # PSU
+    psu_2016 = V160202,
+    psu_2020 = V200011c,
+    psu_2024 = V240106c,
+
+    # Stratum
+    stratum_2016 = V160201,
+    stratum_2020 = V200011d,
+    stratum_2024 = V240106d
+  ) %>%
+  
+  # Convert wide format into long format
+  pivot_longer(
+    cols = -c(V160001_orig, V160001),
+    names_to = c(".value", "year"),
+    names_pattern = "^(.*)_(2016|2020|2024)$",
+    names_transform = list(year = as.integer),
+    values_drop_na = FALSE
+  ) %>%
+
+  # Sort by respondent and year
+  arrange(V160001, year)
+```
+
+
+```{r}
+# Check dimensions
+dim(anes_long)
+
+# Check number of observations per year
+anes_long %>%
+  count(year)
+
+# Check number of unique respondents
+n_distinct(anes_long$V160001_orig)
+
+# Check number of rows per respondent
+anes_long %>%
+  count(V160001_orig) %>%
+  count(n)
+
+# Preview dataset
+head(anes_long, 15)
+```
+
+
+```{r}
+write_csv(
+  anes_long,
+  "ANES_CleanedPanel_Long.csv"
+)
+```
+
