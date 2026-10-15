@@ -89,8 +89,19 @@ anes_selected <- anes_panel_full %>%
     V200011d,       # 2020 panel variance stratum
 
     V240106c,       # 2024 panel PSU
-    V240106d        # 2024 panel stratum
+    V240106d,       # 2024 panel stratum
+    
+    # Additional 2024 Full-Sample PSU / Stratum
+    V240108c,       # 2024 Full-sample PSU
+    V240108d        # 2024 Full-sample Stratum
+  ) %>%
+
+    # Create 2024 Full-Sample Cluster ID
+mutate(
+  cluster_full_2024 = 1000 * (
+    as.numeric(V240108c) + as.numeric(V240108d)
   )
+)
 ```
 
 
@@ -172,7 +183,11 @@ anes_long <- anes_selected %>%
     # Stratum
     stratum_2016 = V160201,
     stratum_2020 = V200011d,
-    stratum_2024 = V240106d
+    stratum_2024 = V240106d,
+    
+    # Additional 2024 Full-Sample PSU / Stratum
+    psu_full_2024 = V240108c,
+    stratum_full_2024 = V240108d
   ) %>%
   
   # Convert wide format into long format
@@ -207,6 +222,16 @@ anes_long %>%
 
 # Preview dataset
 head(anes_long, 15)
+```
+
+
+```{r}
+# Check the number of clusters
+anes_long %>%
+  filter(year == 2024) %>%
+  summarise(
+    n_clusters = n_distinct(cluster_full, na.rm = TRUE)
+  )
 ```
 
 
