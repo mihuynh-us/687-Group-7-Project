@@ -461,4 +461,6 @@ ANES$cluster
 
 
 
-# Model Specfication and Notation
+# Model Specification and Notation
+$therm_{tij}=\beta_0+\beta_1*IDEOLOGY_{tij}+\beta_2*DEMOCRAT+\beta_3*FEMALE+\beta_4*REPUBLICAN+\beta_5*BLACK+\mu_{0j}+\epsilon_{tij}$
+Reference category: Male, independent
