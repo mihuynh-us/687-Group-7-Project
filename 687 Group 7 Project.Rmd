@@ -273,7 +273,31 @@ anes_long <- anes_selected %>%
   ) %>%
 
   # Sort by respondent and year
-  arrange(V160001, year)
+  arrange(V160001, year)%>%
+
+  # Harmonize coding across years
+  mutate(
+
+    # 1. Race: use 2020/2024 coding as reference
+    race = case_when(
+      year == 2016 & race == 3 ~ 4,  # Asian NH
+      year == 2016 & race == 4 ~ 5,  # Native American NH
+      year == 2016 & race == 5 ~ 3,  # Hispanic
+      TRUE ~ race
+    ),
+
+    # 2. Completion status
+    # 0 = PRE only; 1 = PRE + POST; 2 = POST only
+    completion_status = case_when(
+      year == 2016 ~ completion_status,
+      year == 2020 & completion_status == 1 ~ 0,
+      year == 2020 & completion_status == 2 ~ 2,
+      year == 2020 & completion_status == 3 ~ 1,
+      year == 2024 & completion_status == 1 ~ 0,
+      year == 2024 & completion_status == 2 ~ 1,
+      TRUE ~ NA_real_
+    )
+  )
 ```
 
 
