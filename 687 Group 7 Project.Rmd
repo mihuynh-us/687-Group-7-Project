@@ -71,6 +71,7 @@ library(dplyr)
 library(haven)
 library(ggplot2)
 library(tidyr)
+library(lme4)
 ```
 
 ```{r}
@@ -488,3 +489,7 @@ ANES$cluster
 # Model Specification and Notation
 $therm_{tij}=\beta_0+\beta_1*IDEOLOGY_{tij}+\beta_2*DEMOCRAT+\beta_3*FEMALE+\beta_4*REPUBLICAN+\beta_5*BLACK+\mu_{0j}+\epsilon_{tij}$
 Reference category: Male, independent
+
+```{r Multilevel Model}
+lmer(trump_ft_post ~ factor(gender) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + (1|V160001_orig), data = anes_long)
+```
