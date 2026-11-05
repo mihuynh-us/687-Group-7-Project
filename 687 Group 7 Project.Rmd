@@ -492,6 +492,6 @@ Reference category: Male, independent
 
 ```{r Multilevel Model}
 anes_long_filtered <- anes_long %>% filter(party_reg_pre >= 0, race >= 0, gender > 0)
-mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1|V160001_orig), data = anes_long_filtered)
+mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1+year|V160001_orig) + (1|psu), data = anes_long_filtered)
 summary(mod1)
 ```
