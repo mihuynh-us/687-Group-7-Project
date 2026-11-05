@@ -491,5 +491,6 @@ $therm_{tij}=\beta_0+\beta_1*IDEOLOGY_{tij}+\beta_2*DEMOCRAT+\beta_3*FEMALE+\bet
 Reference category: Male, independent
 
 ```{r Multilevel Model}
-lmer(trump_ft_post ~ factor(gender) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + (1|V160001_orig), data = anes_long)
+anes_long_filtered <- anes_long %>% filter(if_all(where(is.numeric), ~ .x >= 0))
+lmer(trump_ft_post ~ factor(gender) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + (1|psu), data = anes_long_filtered)
 ```
