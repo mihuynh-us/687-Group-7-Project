@@ -548,18 +548,37 @@ ggplot(anes_freq_20, aes(
 
 
 
+## Clean Varibles
+```{r}
+# Filter valid outcome and predictor values
+# Retain observations with valid Trump feeling thermometer scores (0–100)
+# political ideology (1–7), party registration (1, 2, 4, 5)
+# gender (1, 2), and race (1–6)
+# Exclude observations with missing, inapplicable, or invalid codes
+# outside these specified ranges
+# Preserve the cluster_id and time4 variables for multilevel modeling
+
+anes_long_1 <- anes_long_1 %>%
+  mutate(
+    gender = replace(gender, gender %in% c(-9), NA),
+    race = replace(race, race %in% c(-2), NA),
+    ideology_pre = replace(ideology_pre, ideology_pre %in% c(-8, -9,99), NA),
+    party_reg_pre = replace(party_reg_pre, party_reg_pre %in% c(-1, -8, -9), NA),
+  )
+
+```
+
 # Model Specification and Notation
 $therm_{tij}=\beta_0+\beta_1*IDEOLOGY_{tij}+\beta_2*DEMOCRAT+\beta_3*FEMALE+\beta_4*REPUBLICAN+\beta_5*BLACK+\mu_{0j}+\epsilon_{tij}$
 Reference category: Male, independent
 
 ```{r Multilevel Model}
-anes_long_filtered <- anes_long %>% filter(party_reg_pre >= 0, race >= 0, gender > 0)
-mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1+year|V160001_orig) + (1|psu), data = anes_long_filtered)
+mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1+year|V160001_orig) + (1|psu), data = anes_long_1)
 summary(mod1)
 ```
+
 ```{r Multilevel Model}
-anes_long_filtered <- anes_long_1 %>% filter(party_reg_pre >= 0, race >= 0, gender > 0)
-mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1+year|V160001_orig) + (1|cluster_full), data = anes_long_filtered)
+mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1+year|V160001_orig) + (1|cluster_full), data = anes_long_1)
 summary(mod1)
 ```
 
@@ -611,25 +630,6 @@ Y_{tij} ={}& \beta_{0ij}
 $$
 
 
-## Might need to filter certain groups
-```{r}
-# Filter valid outcome and predictor values
-# Retain observations with valid Trump feeling thermometer scores (0–100)
-# political ideology (1–7), party registration (1, 2, 4, 5)
-# gender (1, 2), and race (1–6)
-# Exclude observations with missing, inapplicable, or invalid codes
-# outside these specified ranges
-# Preserve the cluster_id and time4 variables for multilevel modeling
-
-anes_long_filtered <- anes_long_1 %>%
-  filter(
-    between(trump_ft_post, 0, 100),
-    ideology_pre %in% 1:7,
-    party_reg_pre %in% c(1, 2, 4, 5),
-    gender %in% c(1, 2, 3),
-    race %in% 1:6
-  )
-```
 
 
 ## Model related to different questions
