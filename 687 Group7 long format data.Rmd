@@ -228,6 +228,72 @@ anes_long <- anes_selected %>%
 ```
 
 
+Change the cluster ID 
+```{r}
+library(dplyr)
+library(lme4)
+
+# Extract original 2016 sampling information
+baseline_clusters <- anes_selected %>%
+  transmute(
+    V160001_orig,
+
+    # ANES 2016 full-sample stratum
+    baseline_stratum = as.integer(V160201),
+
+    # ANES 2016 full-sample variance PSU
+    baseline_psu = as.integer(V160202)
+  ) %>%
+  mutate(
+    # Unique combination, not arithmetic addition
+    cluster_id = if_else(
+      !is.na(baseline_stratum) & !is.na(baseline_psu),
+      paste0("S", baseline_stratum, "_P", baseline_psu),
+      NA_character_
+    )
+  ) %>%
+  distinct(V160001_orig, .keep_all = TRUE)
+
+# Join stable baseline clusters to long data
+anes_long_1 <- anes_long %>%
+  select(-any_of(c(
+    "cluster_full", "cluster_id",
+    "baseline_stratum", "baseline_psu",
+    "time4"
+  ))) %>%
+  left_join(
+    baseline_clusters,
+    by = "V160001_orig"
+  ) %>%
+  mutate(
+    time4 = (year - 2016) / 4
+  )
+```
+time 4: 
+Create a centered time variable representing four-year intervals since 2016 (2016 = 0, 2020 = 1, 2024 = 2).
+Used to estimate individual-level random slopes over time.
+
+
+```{r}
+#  Validate cluster assignments
+anes_long_1 %>%
+  summarise(
+    n_rows = n(),
+    n_respondents = n_distinct(V160001_orig),
+    n_clusters = n_distinct(cluster_id, na.rm = TRUE),
+    missing_cluster = sum(is.na(cluster_id)))
+
+#Verify each respondent has one stable cluster across all waves
+anes_long_1 %>%
+  group_by(V160001_orig) %>%
+  summarise(
+    n_clusters = n_distinct(cluster_id, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  count(n_clusters)
+```
+
+
 ```{r}
 # Check dimensions
 dim(anes_long)

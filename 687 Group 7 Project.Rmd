@@ -268,7 +268,7 @@ anes_long <- anes_selected %>%
   
   # Convert wide format into long format
   pivot_longer(
-    cols = -c(V160001_orig, V160001, ),
+    cols = -c(V160001_orig, V160001),
     names_to = c(".value", "year"),
     names_pattern = "^(.*)_(2016|2020|2024)$",
     names_transform = list(year = as.integer),
@@ -316,6 +316,52 @@ anes_long_1 <- anes_long %>%
     by = "V160001_orig"
   )
 ```
+
+
+Change the cluster ID based on 2016
+```{r}
+library(dplyr)
+library(lme4)
+
+# Extract original 2016 sampling information
+baseline_clusters <- anes_selected %>%
+  transmute(
+    V160001_orig,
+
+    # ANES 2016 full-sample stratum
+    baseline_stratum = as.integer(V160201),
+
+    # ANES 2016 full-sample variance PSU
+    baseline_psu = as.integer(V160202)
+  ) %>%
+  mutate(
+    # Unique combination, not arithmetic addition
+    cluster_id = if_else(
+      !is.na(baseline_stratum) & !is.na(baseline_psu),
+      paste0("S", baseline_stratum, "_P", baseline_psu),
+      NA_character_
+    )
+  ) %>%
+  distinct(V160001_orig, .keep_all = TRUE)
+
+# Join stable baseline clusters to long data
+anes_long_1 <- anes_long %>%
+  select(-any_of(c(
+    "cluster_full", "cluster_id",
+    "baseline_stratum", "baseline_psu",
+    "time4"
+  ))) %>%
+  left_join(
+    baseline_clusters,
+    by = "V160001_orig"
+  ) %>%
+  mutate(
+    time4 = (year - 2016) / 4
+  )
+```
+time 4: 
+Create a centered time variable representing four-year intervals since 2016 (2016 = 0, 2020 = 1, 2024 = 2).
+Used to estimate individual-level random slopes over time.
 
 
 ```{r}
@@ -563,3 +609,133 @@ Y_{tij} ={}& \beta_{0ij}
 &+ u_{0ij} + u_{0j} + e_{tij}
 \end{aligned}
 $$
+
+
+## Might need to filter certain groups
+```{r}
+# Filter valid outcome and predictor values
+# Retain observations with valid Trump feeling thermometer scores (0–100)
+# political ideology (1–7), party registration (1, 2, 4, 5)
+# gender (1, 2), and race (1–6)
+# Exclude observations with missing, inapplicable, or invalid codes
+# outside these specified ranges
+# Preserve the cluster_id and time4 variables for multilevel modeling
+
+anes_long_filtered <- anes_long_1 %>%
+  filter(
+    between(trump_ft_post, 0, 100),
+    ideology_pre %in% 1:7,
+    party_reg_pre %in% c(1, 2, 4, 5),
+    gender %in% c(1, 2),
+    race %in% 1:6
+  )
+```
+
+
+## Model related to different questions
+
+To what extent do individual-level and sampling-cluster-level differences account for variation in Trump feeling thermometer ratings?
+
+$$
+Y_{tij} = \beta_0 + u_{0j} + u_{0ij} + e_{tij}
+$$
+
+```{r}
+mod_rq1 <- lmer(
+  trump_ft_post ~ 1 +
+    (1 | cluster_id) +
+    (1 | V160001_orig),
+  data = anes_long_1,
+  REML = TRUE
+)
+
+summary(mod_rq1)
+VarCorr(mod_rq1)
+```
+
+How do Trump feeling thermometer ratings change across the 2016, 2020, and 2024 election cycles?
+
+$$
+\begin{aligned}
+Y_{tij} ={}& \beta_0
++ \beta_1 YEAR2020_t
++ \beta_2 YEAR2024_t \\
+&+ u_{0j} + u_{0ij} + e_{tij}
+\end{aligned}
+$$
+
+
+```{r}
+mod_rq2 <- lmer(
+  trump_ft_post ~ factor(year) +
+    (1 | cluster_id) +
+    (1 | V160001_orig),
+  data = anes_long_1,
+  REML = TRUE
+)
+
+summary(mod_rq2)
+```
+
+To what extent do individuals differ in their trajectories of Trump feeling thermometer ratings over time?
+
+$$
+\begin{aligned}
+Y_{tij} ={}& \beta_0
++ \beta_1 YEAR2020_t
++ \beta_2 YEAR2024_t \\
+&+ u_{0j} + u_{0ij}
++ u_{1ij} TIME4_t
++ e_{tij}
+\end{aligned}
+$$
+
+```{r}
+mod_rq3 <- lmer(
+  trump_ft_post ~ factor(year) +
+    (1 | cluster_id) +
+    (1 + time4 | V160001_orig),
+  data = anes_long_1,
+  REML = TRUE
+)
+
+summary(mod_rq3)
+VarCorr(mod_rq3)
+isSingular(mod_rq3)
+```
+
+
+Final model
+$$
+\begin{aligned}
+Y_{tij} ={}& \beta_0
++ \beta_1 YEAR2020_t
++ \beta_2 YEAR2024_t \\
+&+ \beta_3 GENDER_{tij}
++ \beta_4 IDEOLOGY_{tij} \\
+&+ \beta_5 PARTY_{tij}
++ \beta_6 RACE_{tij} \\
+&+ u_{0j} + u_{0ij}
++ u_{1ij} TIME4_t + e_{tij}
+\end{aligned}
+$$
+
+
+```{r}
+mod_final <- lmer(
+  trump_ft_post ~
+    factor(year) +
+    factor(gender) +
+    factor(ideology_pre) +
+    factor(party_reg_pre) +
+    factor(race) +
+    (1 | cluster_id) +
+    (1 + time4 | V160001_orig),
+  data = anes_long_1,
+  REML = TRUE
+)
+
+summary(mod_final)
+```
+
+
