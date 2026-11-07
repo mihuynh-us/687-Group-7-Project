@@ -513,7 +513,7 @@ summary(mod1)
 ```
 ```{r Multilevel Model}
 anes_long_filtered <- anes_long_1 %>% filter(party_reg_pre >= 0, race >= 0, gender > 0)
-mod1 <- lmer(trump_ft_post ~ factor(gender) + year + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1+year|V160001_orig) + (1|cluster_full), data = anes_long_filtered)
+mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1+year|V160001_orig) + (1|cluster_full), data = anes_long_filtered)
 summary(mod1)
 ```
 
@@ -545,7 +545,7 @@ $$
 **Level 3: Cluster**
 
 $$
-\beta_{00j} = \gamma_{000} + v_{0j}
+\beta_{00j} = \beta_{0j} + u_{0j}
 $$
 
 **Combined Model**
