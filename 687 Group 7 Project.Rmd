@@ -61,11 +61,11 @@ Wisconsin 56. Wyoming
 
 ```{r, warnings=FALSE, include = FALSE}
 options(repos = c(CRAN = "https://cloud.r-project.org/"))
-install.packages("readr")
-install.packages("haven")
-install.packages("dplyr")
-install.packages("ggplot2")
-install.packages("tidyr")
+#install.packages("readr")
+#install.packages("haven")
+#install.packages("dplyr")
+#install.packages("ggplot2")
+#install.packages("tidyr")
 library(readr)
 library(dplyr)
 library(haven)
@@ -80,6 +80,7 @@ anes_mergedfile_2016_2020_2024 <- read_csv("ANES_Panel_Full.csv")
 anes_mergedfile_2016_2020_2024_sav <- read_sav("anes_cleaned_0929.sav")
 anes_cleaned <- anes_mergedfile_2016_2020_2024 %>% select(contains(c("V240106a", "V240106b", "V162079", "V200011a", "V202144", "V242126", "V201200", "V160001", "V160001_orig", "241177", "V162171", "V202064", "V162292a", "V168307", "V245005", "V162291", "V202637","V241501x", "V201549x", "V168311", "V168312", "V168313", "V168314", "V168315", "V168316", "V203000", "V243002", "V203000", "V161010d", "V160202", "V200011c", "V240106c","V240107c","V240108c")))
 ```
+
 ```{r}
 # Read full ANES panel data
 library(tidyverse)
@@ -183,7 +184,8 @@ mutate(
 # Convert ANES panel from Wide to long format
 
 anes_long <- anes_selected %>%
-
+  
+  
   # Standardize variable types before reshaping
   mutate(
     across(
@@ -266,7 +268,7 @@ anes_long <- anes_selected %>%
   
   # Convert wide format into long format
   pivot_longer(
-    cols = -c(V160001_orig, V160001),
+    cols = -c(V160001_orig, V160001, ),
     names_to = c(".value", "year"),
     names_pattern = "^(.*)_(2016|2020|2024)$",
     names_transform = list(year = as.integer),
@@ -298,6 +300,20 @@ anes_long <- anes_selected %>%
       year == 2024 & completion_status == 2 ~ 1,
       TRUE ~ NA_real_
     )
+  )
+```
+
+```{r}
+anes_long_1 <- anes_long %>%
+  select(-any_of("cluster_full")) %>%
+  left_join(
+    anes_selected %>%
+      transmute(
+        V160001_orig,
+        cluster_full = 1000 * (as.numeric(V240108c) + as.numeric(V240108d))
+      ) %>%
+      distinct(V160001_orig, .keep_all = TRUE),
+    by = "V160001_orig"
   )
 ```
 
@@ -495,3 +511,55 @@ anes_long_filtered <- anes_long %>% filter(party_reg_pre >= 0, race >= 0, gender
 mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1+year|V160001_orig) + (1|psu), data = anes_long_filtered)
 summary(mod1)
 ```
+```{r Multilevel Model}
+anes_long_filtered <- anes_long_1 %>% filter(party_reg_pre >= 0, race >= 0, gender > 0)
+mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1+year|V160001_orig) + (1|cluster_full), data = anes_long_filtered)
+summary(mod1)
+```
+
+
+### Three-Level Multilevel Model Specification
+
+**Level 1: Time**
+
+$$
+\begin{aligned}
+Y_{tij} ={}& \beta_{0ij}
++ \beta_1 YEAR2020_{tij}
++ \beta_2 YEAR2024_{tij} \\
+&+ \beta_3 GENDER_{tij}
++ \beta_4 IDEOLOGY_{tij} \\
+&+ \beta_5 PARTY_{tij}
++ \beta_6 RACE_{tij} \\
+&+ \beta_7 (RACE \times GENDER)_{tij}
++ e_{tij}
+\end{aligned}
+$$
+
+**Level 2: Individual**
+
+$$
+\beta_{0ij} = \beta_{00j} + u_{0ij}
+$$
+
+**Level 3: Cluster**
+
+$$
+\beta_{00j} = \beta_{0j} + u_{0j}
+$$
+
+**Combined Model**
+
+$$
+\begin{aligned}
+Y_{tij} ={}& \beta_{0ij}
++ \beta_1 YEAR2020_{tij}
++ \beta_2 YEAR2024_{tij} \\
+&+ \beta_3 GENDER_{tij}
++ \beta_4 IDEOLOGY_{tij} \\
+&+ \beta_5 PARTY_{tij}
++ \beta_6 RACE_{tij} \\
+&+ \beta_7 (RACE \times GENDER)_{tij} \\
+&+ u_{0ij} + u_{0j} + e_{tij}
+\end{aligned}
+$$
