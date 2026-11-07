@@ -573,6 +573,12 @@ $therm_{tij}=\beta_0+\beta_1*IDEOLOGY_{tij}+\beta_2*DEMOCRAT+\beta_3*FEMALE+\bet
 Reference category: Male, independent
 
 ```{r Multilevel Model}
+mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race)  + (1+year|V160001_orig) + (1|cluster_full), data = anes_long_1)
+summary(mod1)
+```
+
+
+```{r Multilevel Model}
 mod1 <- lmer(trump_ft_post ~ factor(gender) + factor(year) + factor(ideology_pre) + factor(party_reg_pre) + factor(race) + factor(race)*factor(gender) + (1+year|V160001_orig) + (1|psu), data = anes_long_1)
 summary(mod1)
 ```
