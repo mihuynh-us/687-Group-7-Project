@@ -451,6 +451,47 @@ mean_2024 <- anes_cleaned %>%
   summarise(count_2024 = n(), mean_2024 = mean(V242126), .groups = 'drop')
 mean_by_gender_2016; mean_by_gender_2020; mean_by_gender_2024; mean_2016; mean_2020; mean_2024
 ```
+### Mi - Descriptive plots for Political Ideology vs. Feel Thermometer
+### Race vs. Feel Thermometer Plots
+```{r}
+# Descriptive plots for Political Ideology vs. Feel Thermometer 2016
+ggplot(data = anes_selected %>% filter(V161126 %in% c(1:7)), aes(x = factor(V161126, labels = c("Extremely liberal", "Liberal", "Slightly liberal", "Moderate", "Slightly conservative", "Conservative", "Extremely conservative")), y = V162079)) +
+  geom_boxplot() +
+  labs(x = "Political Ideology", y = "Trump Feeling Thermometer", title = "2016 Political Ideology vs. Feeling Thermometer") +
+  guides(x = guide_axis(n.dodge = 2))
+
+# Descriptive plots for Political Ideology vs. Feel Thermometer 2020
+ggplot(data = anes_selected %>% filter(V201200 %in% c(1:7)), aes(x = factor(V201200, labels = c("Extremely liberal", "Liberal", "Slightly liberal", "Moderate", "Slightly conservative", "Conservative", "Extremely conservative")), y = V202144)) +
+  geom_boxplot() +
+  labs(x = "Political Ideology", y = "Trump Feeling Thermometer", title = "2020 Political Ideology vs. Feeling Thermometer") +
+  guides(x = guide_axis(n.dodge = 2))
+
+# Descriptive plots for Political Ideology vs. Feel Thermometer 2024
+ggplot(data = anes_selected %>% filter(V241177 %in% c(1:7)), aes(x = factor(V241177, labels = c("Extremely liberal", "Liberal", "Slightly liberal", "Moderate", "Slightly conservative", "Conservative", "Extremely conservative")), y = V242126)) +
+  geom_boxplot() +
+  labs(x = "Political Ideology", y = "Trump Feeling Thermometer", title = "2024 Political Ideology vs. Feeling Thermometer") +
+  guides(x = guide_axis(n.dodge = 2))
+
+# Descriptive plots for Race vs. Feel Thermometer 2016
+ggplot(data = anes_selected %>% filter(V161310x %in% c(1:6)), aes(x = factor(V161310x, labels = c("White, non-Hispanic", "Black, non-Hispanic", "Hispanic", "Asian / Pacific Islander, non-Hispanic", "Native American / Alaska Native or other race", "Multiple races, non-Hispanic")), y = V162079)) +
+  geom_boxplot() +
+  labs(x = "Race", y = "Trump Feeling Thermometer", title = "2016 Race vs. Feeling Thermometer") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Descriptive plots for Race vs. Feel Thermometer 2020
+ggplot(data = anes_selected %>% filter(V201549x %in% c(1:6)), aes(x = factor(V201549x, labels = c("White, non-Hispanic", "Black, non-Hispanic", "Hispanic", "Asian / Pacific Islander, non-Hispanic", "Native American / Alaska Native or other race", "Multiple races, non-Hispanic")), y = V202144)) +
+  geom_boxplot() +
+  labs(x = "Race", y = "Trump Feeling Thermometer", title = "2020 Race vs. Feeling Thermometer") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Descriptive plots for Race vs. Feel Thermometer 2024
+ggplot(data = anes_selected %>% filter(V241501x %in% c(1:6)), aes(x = factor(V241501x, labels = c("White, non-Hispanic", "Black, non-Hispanic", "Hispanic", "Asian / Pacific Islander, non-Hispanic", "Native American / Alaska Native or other race", "Multiple races, non-Hispanic")), y = V242126)) +
+  geom_boxplot() +
+  labs(x = "Race", y = "Trump Feeling Thermometer", title = "2024 Race vs. Feeling Thermometer") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
 
 ## Zack Descrpitives-
 
@@ -545,7 +586,6 @@ ggplot(anes_freq_20, aes(
 # ANES$V240108c
 # ANES$cluster
 ```
-
 
 
 ## Clean Varibles
