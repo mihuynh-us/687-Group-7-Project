@@ -1,0 +1,159 @@
+---
+title: "ANES Descriptive Stats between Variables"
+author: "Mi Huynh"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+
+```{r, warnings=FALSE, include = FALSE}
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
+#install.packages("readr")
+#install.packages("haven")
+#install.packages("dplyr")
+#install.packages("ggplot2")
+#install.packages("tidyr")
+library(readr)
+library(dplyr)
+library(haven)
+library(ggplot2)
+library(tidyr)
+library(lme4)
+```
+
+```{r}
+# Read full ANES panel data
+library(tidyverse)
+
+anes_panel_full <- read_csv(
+  "ANES_Panel_Full.csv",
+  na = c("", " ", "NA"),
+  show_col_types = FALSE
+)
+```
+
+```{r, echo=FALSE}
+# Select variables needed 
+anes_selected <- anes_panel_full %>%
+  select(
+
+    # Respondent / Case IDs
+    V160001_orig,   # Stable 2016 respondent ID
+    V160001,        # 2016 case ID
+
+    # Sample / interview completion status
+    V160502,        # 2016 pre/post completion
+    V200003,        # 2020 sample type
+    V200004,        # 2020 pre/post completion
+    V240003,        # 2024 sample type
+    V240002c,       # 2024 pre/post completion
+    
+    # PRE Trump Feeling Thermometer
+    V161087,        # 2016
+    V201152,        # 2020
+    V241157,        # 2024
+
+    # POST Trump Feeling Thermometer
+    V162079,        # 2016
+    V202144,        # 2020
+    V242126,        # 2024
+
+    # PRE Party of Registration
+    # Don't use POST here since so many NAs in 2024
+    V161019,        # 2016
+    V201018,        # 2020
+    V241025,        # 2024
+
+    # Race / Ethnicity
+    V161310x,       # 2016
+    V201549x,       # 2020
+    V241501x,       # 2024
+
+    # PRE Liberal-Conservative Self-Placement
+    # Don't use POST here since we only have 2016 data
+    V161126,        # 2016
+    V201200,        # 2020
+    V241177,        # 2024
+
+    # Respondent Gender / Sex
+    V161342,        # 2016
+    V201600,        # 2020
+    V241550,        # 2024
+
+    # State
+    V161010d,       # 2016 FIPS state
+    V203000,        # 2020 FIPS state
+    V243002,        # 2024 FIPS state
+
+    # PRE / POST Weights
+    V160101,        # 2016 PRE weight
+    V160102,        # 2016 POST weight
+
+    V200011a,       # 2020 panel PRE weight
+    V200011b,       # 2020 panel POST weight
+
+    V240106a,       # 2024 panel PRE weight
+    V240106b,       # 2024 panel POST weight
+
+    # PSU / Stratum
+    V160201,        # 2016 Stratum – Full sample 
+    V160202,        # 2016 Variance PSU – full sample 
+
+    V200011c,       # 2020 panel variance unit
+    V200011d,       # 2020 panel variance stratum
+
+    V240106c,       # 2024 panel PSU
+    V240106d,       # 2024 panel stratum
+    
+    # Additional 2024 Full-Sample PSU / Stratum
+    V240108c,       # 2024 Full-sample PSU
+    V240108d        # 2024 Full-sample Stratum
+  ) %>%
+
+    # Create 2024 Full-Sample Cluster ID
+mutate(
+  cluster_full_2024 = 1000 * (
+    as.numeric(V240108c) + as.numeric(V240108d)
+  )
+)
+```
+
+### Mi - Descriptive plots for Political Ideology vs. Feel Thermometer
+### Race vs. Feel Thermometer Plots
+```{r}
+# Descriptive plots for Political Ideology vs. Feel Thermometer 2016
+ggplot(data = anes_selected %>% filter(V161126 %in% c(1:7)), aes(x = factor(V161126, labels = c("Extremely liberal", "Liberal", "Slightly liberal", "Moderate", "Slightly conservative", "Conservative", "Extremely conservative")), y = V162079)) +
+  geom_boxplot() +
+  labs(x = "Political Ideology", y = "Trump Feeling Thermometer", title = "2016 Political Ideology vs. Feeling Thermometer") +
+  guides(x = guide_axis(n.dodge = 2))
+
+# Descriptive plots for Political Ideology vs. Feel Thermometer 2020
+ggplot(data = anes_selected %>% filter(V201200 %in% c(1:7)), aes(x = factor(V201200, labels = c("Extremely liberal", "Liberal", "Slightly liberal", "Moderate", "Slightly conservative", "Conservative", "Extremely conservative")), y = V202144)) +
+  geom_boxplot() +
+  labs(x = "Political Ideology", y = "Trump Feeling Thermometer", title = "2020 Political Ideology vs. Feeling Thermometer") +
+  guides(x = guide_axis(n.dodge = 2))
+
+# Descriptive plots for Political Ideology vs. Feel Thermometer 2024
+ggplot(data = anes_selected %>% filter(V241177 %in% c(1:7)), aes(x = factor(V241177, labels = c("Extremely liberal", "Liberal", "Slightly liberal", "Moderate", "Slightly conservative", "Conservative", "Extremely conservative")), y = V242126)) +
+  geom_boxplot() +
+  labs(x = "Political Ideology", y = "Trump Feeling Thermometer", title = "2024 Political Ideology vs. Feeling Thermometer") +
+  guides(x = guide_axis(n.dodge = 2))
+
+# Descriptive plots for Race vs. Feel Thermometer 2016
+ggplot(data = anes_selected %>% filter(V161310x %in% c(1:6)), aes(x = factor(V161310x, labels = c("White, non-Hispanic", "Black, non-Hispanic", "Hispanic", "Asian / Pacific Islander, non-Hispanic", "Native American / Alaska Native or other race", "Multiple races, non-Hispanic")), y = V162079)) +
+  geom_boxplot() +
+  labs(x = "Race", y = "Trump Feeling Thermometer", title = "2016 Race vs. Feeling Thermometer") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Descriptive plots for Race vs. Feel Thermometer 2020
+ggplot(data = anes_selected %>% filter(V201549x %in% c(1:6)), aes(x = factor(V201549x, labels = c("White, non-Hispanic", "Black, non-Hispanic", "Hispanic", "Asian / Pacific Islander, non-Hispanic", "Native American / Alaska Native or other race", "Multiple races, non-Hispanic")), y = V202144)) +
+  geom_boxplot() +
+  labs(x = "Race", y = "Trump Feeling Thermometer", title = "2020 Race vs. Feeling Thermometer") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Descriptive plots for Race vs. Feel Thermometer 2024
+ggplot(data = anes_selected %>% filter(V241501x %in% c(1:6)), aes(x = factor(V241501x, labels = c("White, non-Hispanic", "Black, non-Hispanic", "Hispanic", "Asian / Pacific Islander, non-Hispanic", "Native American / Alaska Native or other race", "Multiple races, non-Hispanic")), y = V242126)) +
+  geom_boxplot() +
+  labs(x = "Race", y = "Trump Feeling Thermometer", title = "2024 Race vs. Feeling Thermometer") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
