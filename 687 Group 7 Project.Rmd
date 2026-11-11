@@ -587,6 +587,12 @@ ggplot(anes_freq_20, aes(
 # ANES$cluster
 ```
 
+## Tabulate Missingness 
+```{r}
+anes_long_miss
+```
+
+
 
 ## Clean Varibles
 ```{r}
