@@ -501,20 +501,7 @@ ggplot(anes_freq_20, aes(
   theme_minimal()
 
 ```
-# Cluster + Stratum Combo
 
-
-```{r}
-# ANES_Panel_Full->ANES
-# 
-# library(dplyr)
-# 
-# ANES <- ANES %>%
-#   mutate(cluster = 1000 * (V240108c + V240108d))
-# 
-# ANES$V240108c
-# ANES$cluster
-```
 
 ## Tabulate Missingness 
 ```{r}
@@ -781,7 +768,7 @@ anes_long_1 <- anes_long %>%
 
 
 ```{r}
-#Earlhy dimension check
+#Early dimension check
 # Check dimensions
 dim(anes_long)
 
@@ -809,4 +796,15 @@ anes_long %>%
 ```
 
 
-
+```{r}
+# Early cluster code
+# ANES_Panel_Full->ANES
+# 
+# library(dplyr)
+# 
+# ANES <- ANES %>%
+#   mutate(cluster = 1000 * (V240108c + V240108d))
+# 
+# ANES$V240108c
+# ANES$cluster
+```
