@@ -598,6 +598,16 @@ ggplot(anes_freq_20, aes(
 # outside these specified ranges
 # Preserve the cluster_id and time4 variables for multilevel modeling
 
+#without Ideology 99
+anes_long_1 <- anes_long_1 %>%
+  mutate(
+    gender = replace(gender, gender %in% c(-9), NA),
+    race = replace(race, race %in% c(-2), NA),
+    ideology_pre = replace(ideology_pre, ideology_pre %in% c(-8, -9), NA),
+    party_reg_pre = replace(party_reg_pre, party_reg_pre %in% c(-1, -8, -9), NA),
+  )
+
+#with Ideology 99
 anes_long_1 <- anes_long_1 %>%
   mutate(
     gender = replace(gender, gender %in% c(-9), NA),
@@ -605,7 +615,6 @@ anes_long_1 <- anes_long_1 %>%
     ideology_pre = replace(ideology_pre, ideology_pre %in% c(-8, -9,99), NA),
     party_reg_pre = replace(party_reg_pre, party_reg_pre %in% c(-1, -8, -9), NA),
   )
-
 ```
 
 # Model Specification and Notation
