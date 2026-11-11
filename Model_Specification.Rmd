@@ -1,0 +1,19 @@
+---
+title: "Model Specficiation"
+author: "Zack , Mi, Yiyang"
+date: "2026-11-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+anes_panel_full <- read_csv(
+  "ANES_CleanedPanel_Long.csv",
+  na = c("", " ", "NA"),
+  show_col_types = FALSE
+)
+```
+
