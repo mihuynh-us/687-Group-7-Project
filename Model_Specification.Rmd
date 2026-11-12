@@ -8,6 +8,17 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+```{r}
+library(readr)
+library(dplyr)
+library(haven)
+library(ggplot2)
+library(tidyr)
+library(lme4)
+```
+
+
 # load data
 ```{r}
 anes_panel_full <- read_csv(
@@ -143,4 +154,8 @@ Asian/Pacific Islander, non-Hispanic $\hat{\beta}_{16}$:
 Native American/Alaska Native or Other Race $\hat{\beta}_{17}$:
 
 Multiple Races $\hat{\beta}_{18}$:
+
+## LRT testing 
+
+
 
