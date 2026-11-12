@@ -8,7 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+# load data
 ```{r}
 anes_panel_full <- read_csv(
   "ANES_CleanedPanel_Long.csv",
@@ -16,4 +16,94 @@ anes_panel_full <- read_csv(
   show_col_types = FALSE
 )
 ```
+
+# intercept models
+
+```{r}
+#with extra labels
+anes_ex_labels <- anes_panel_full %>%
+  mutate(
+    gender = replace(gender, gender %in% c(-9), NA),
+    race = replace(race, race %in% c(-2), NA),
+    ideology_pre = replace(ideology_pre, ideology_pre %in% c(-8, -9), NA),
+    party_reg_pre = replace(party_reg_pre, party_reg_pre %in% c(-1, -8, -9), NA),
+  )
+
+#with extra labels 
+anes_in_labels <- anes_panel_full %>%
+  mutate(
+    gender = replace(gender, gender %in% c(-9), NA),
+    race = replace(race, race %in% c(-2), NA),
+    ideology_pre = replace(ideology_pre, ideology_pre %in% c(-8, -9,99), NA),
+    party_reg_pre = replace(party_reg_pre, party_reg_pre %in% c(-1, -8, -9), NA),
+  )
+```
+
+## Change labels for the data
+
+```{r}
+anes_ex_labels_clean <- anes_ex_labels %>%
+  mutate(
+    gender = factor(
+      gender,
+      levels = c(1, 2, 3),
+      labels = c("Male", "Female", "Other")
+    ),
+
+    year = factor(
+      year,
+      levels = c(2016, 2020, 2024),
+      labels = c("2016", "2020", "2024")
+    ),
+
+    ideology_pre = factor(
+      ideology_pre,
+      levels = 1:7,
+      labels = c(
+        "Extremely Liberal",
+        "Liberal",
+        "Slightly Liberal",
+        "Moderate",
+        "Slightly Conservative",
+        "Conservative",
+        "Extremely Conservative"
+      )
+    ),
+
+    party_reg_pre = factor(
+      party_reg_pre,
+      levels = c(1, 2, 4, 5),
+      labels = c(
+        "Democratic Party",
+        "Republican  Party",
+        "None/ Independent",
+        "Other Party"
+      )
+    ),
+
+    race = factor(
+      race,
+      levels = 1:6,
+      labels = c(
+        "White, non Hispanic",
+        "Black, non Hispanic",
+        "Hispanic",
+        "Asian/ Pacific Islander, non-Hispanic",
+        "Native American/Alaska Native or other 
+        race,Non Hispanic",
+        "Multiple races"
+      )
+    )
+  )
+```
+
+
+
+```{r}
+mod1.1 <- lmer(trump_ft_post ~ gender+ year + ideology_pre + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_labels_clean)
+summary(mod1.1)
+
+```
+
+
 
