@@ -105,41 +105,42 @@ summary(mod1.1)
 
 ```
 
-$\hat{\beta}_0$:
 
-$\hat{\beta}_1$:
+Intercept $\hat{\beta}_0$:
 
-$\hat{\beta}_2$:
+Female $\hat{\beta}_1$:
 
-$\hat{\beta}_3$:
+Other Gender $\hat{\beta}_2$:
 
-$\hat{\beta}_4$:
+Year 2020 $\hat{\beta}_3$:
 
-$\hat{\beta}_5$:
+Year 2024 $\hat{\beta}_4$:
 
-$\hat{\beta}_6$:
+Liberal $\hat{\beta}_5$:
 
-$\hat{\beta}_7$:
+Slightly Liberal $\hat{\beta}_6$:
 
-$\hat{\beta}_8$:
+Moderate $\hat{\beta}_7$:
 
-$\hat{\beta}_9$:
+Slightly Conservative $\hat{\beta}_8$:
 
-$\hat{\beta}_{10}$:
+Conservative $\hat{\beta}_9$:
 
-$\hat{\beta}_{11}$:
+Extremely Conservative $\hat{\beta}_{10}$:
 
-$\hat{\beta}_{12}$:
+Republican Party $\hat{\beta}_{11}$:
 
-$\hat{\beta}_{13}$:
+None/Independent $\hat{\beta}_{12}$:
 
-$\hat{\beta}_{14}$:
+Other Party $\hat{\beta}_{13}$:
 
-$\hat{\beta}_{15}$:
+Black, non-Hispanic $\hat{\beta}_{14}$:
 
-$\hat{\beta}_{16}$:
+Hispanic $\hat{\beta}_{15}$:
 
-$\hat{\beta}_{17}$:
+Asian/Pacific Islander, non-Hispanic $\hat{\beta}_{16}$:
 
-$\hat{\beta}_{18}$:
+Native American/Alaska Native or Other Race $\hat{\beta}_{17}$:
+
+Multiple Races $\hat{\beta}_{18}$:
 
