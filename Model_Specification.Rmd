@@ -105,5 +105,41 @@ summary(mod1.1)
 
 ```
 
+$\hat{\beta}_0$:
 
+$\hat{\beta}_1$:
+
+$\hat{\beta}_2$:
+
+$\hat{\beta}_3$:
+
+$\hat{\beta}_4$:
+
+$\hat{\beta}_5$:
+
+$\hat{\beta}_6$:
+
+$\hat{\beta}_7$:
+
+$\hat{\beta}_8$:
+
+$\hat{\beta}_9$:
+
+$\hat{\beta}_{10}$:
+
+$\hat{\beta}_{11}$:
+
+$\hat{\beta}_{12}$:
+
+$\hat{\beta}_{13}$:
+
+$\hat{\beta}_{14}$:
+
+$\hat{\beta}_{15}$:
+
+$\hat{\beta}_{16}$:
+
+$\hat{\beta}_{17}$:
+
+$\hat{\beta}_{18}$:
 
