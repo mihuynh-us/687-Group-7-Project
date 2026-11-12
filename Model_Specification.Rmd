@@ -72,8 +72,8 @@ anes_ex_labels_clean <- anes_ex_labels %>%
       levels = 1:7,
       labels = c(
         "Extremely Liberal",
-        "Liberal",
         "Slightly Liberal",
+        "Liberal",
         "Moderate",
         "Slightly Conservative",
         "Conservative",
@@ -109,6 +109,17 @@ anes_ex_labels_clean <- anes_ex_labels %>%
 ```
 
 
+**Do we need to remove the obsrevations that do not have a cluster that is usable because they do not have a final cluster code?**
+
+```{r}
+lapply(
+  model.frame(mod1.1)[
+    c("gender", "year", "ideology_pre", "party_reg_pre", "race")
+  ],
+  levels
+)
+```
+
 
 ```{r}
 mod1.1 <- lmer(trump_ft_post ~ gender+ year + ideology_pre + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_labels_clean)
@@ -116,6 +127,8 @@ summary(mod1.1)
 
 ```
 
+
+### Analysis 
 
 Intercept $\hat{\beta}_0$:
 
@@ -155,7 +168,33 @@ Native American/Alaska Native or Other Race $\hat{\beta}_{17}$:
 
 Multiple Races $\hat{\beta}_{18}$:
 
-## LRT testing 
 
+### Ideology continous 
+
+```{r}
+
+anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
+  mutate(
+    ideology_c = ideology_cont - 1
+  )
+
+mod1.2 <- lmer(trump_ft_post ~ gender+ year + ideology_cont + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_labels_clean)
+
+summary (mod1.2)
+```
+
+
+## LRT testing 
+**ASk Brady what to do when the cluster varible used is missing. We use final cluster to connect all three waves to the same perons**
+**should cluster code be for the indivdual or by the observation I thought it should be for all**
+```{r}
+sum(is.na(anes_ex_labels_clean$V160001_orig))
+sum(is.na(anes_ex_labels_clean$cluster_full))
+
+anes_ex_labels_clean <- anes_ex_labels_clean %>%
+  filter(!is.na(cluster_full))
+
+lmerTest::ranova(mod1.1) 
+```
 
 
