@@ -675,52 +675,7 @@ sample_with99 %>%
 ```
 
 ```{r}
-# Longitudinal Observation Patterns
 
-# Count usable waves for each respondent
-wave_patterns <- anes_long_1 %>%
-  group_by(V160001_orig) %>%
-  summarise(
-    # Waves with valid Trump FT scores
-    n_valid_ft = sum(
-      between(trump_ft_post, 0, 100),
-      na.rm = TRUE
-    ),
-
-    # Waves available for the model excluding ideology 99
-    n_model_no99 = sum(
-      between(trump_ft_post, 0, 100) &
-        ideology_pre %in% 1:7 &
-        party_reg_pre %in% c(1, 2, 4, 5) &
-        gender %in% c(1, 2, 3) &
-        race %in% 1:6,
-      na.rm = TRUE
-    ),
-
-    # Waves available for the model keeping ideology 99
-    n_model_with99 = sum(
-      between(trump_ft_post, 0, 100) &
-        ideology_pre %in% c(1:7, 99) &
-        party_reg_pre %in% c(1, 2, 4, 5) &
-        gender %in% c(1, 2, 3) &
-        race %in% 1:6,
-      na.rm = TRUE
-    ),
-
-    .groups = "drop"
-  )
-
-# Valid outcome waves
-wave_patterns %>%
-  count(n_valid_ft, name = "n_respondents")
-
-# Model-eligible waves: excluding 99
-wave_patterns %>%
-  count(n_model_no99, name = "n_respondents")
-
-# Model-eligible waves: keeping 99
-wave_patterns %>%
-  count(n_model_with99, name = "n_respondents")
 ```
 
 
