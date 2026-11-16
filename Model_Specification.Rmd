@@ -10,10 +10,224 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+library(readr)
+library(dplyr)
+library(haven)
+library(ggplot2)
+library(tidyr)
+library(lme4)
+```
+
+
+# load data
+```{r}
 anes_panel_full <- read_csv(
   "ANES_CleanedPanel_Long.csv",
   na = c("", " ", "NA"),
   show_col_types = FALSE
 )
+```
+
+# intercept models
+
+```{r}
+#with extra labels
+anes_ex_labels <- anes_panel_full %>%
+  mutate(
+    gender = replace(gender, gender %in% c(-9), NA),
+    race = replace(race, race %in% c(-2), NA),
+    ideology_pre = replace(ideology_pre, ideology_pre %in% c(-8, -9), NA),
+    party_reg_pre = replace(party_reg_pre, party_reg_pre %in% c(-1, -8, -9), NA),
+  )
+
+#with extra labels 
+anes_in_labels <- anes_panel_full %>%
+  mutate(
+    gender = replace(gender, gender %in% c(-9), NA),
+    race = replace(race, race %in% c(-2), NA),
+    ideology_pre = replace(ideology_pre, ideology_pre %in% c(-8, -9,99), NA),
+    party_reg_pre = replace(party_reg_pre, party_reg_pre %in% c(-1, -8, -9), NA),
+  )
+```
+
+## Change labels for the data
+
+```{r}
+anes_ex_labels_clean <- anes_ex_labels %>%
+  mutate(
+    gender = factor(
+      gender,
+      levels = c(1, 2, 3),
+      labels = c("Male", "Female", "Other")
+    ),
+
+    year = factor(
+      year,
+      levels = c(2016, 2020, 2024),
+      labels = c("2016", "2020", "2024")
+    ),
+
+    ideology_pre = factor(
+      ideology_pre,
+      levels = 1:7,
+      labels = c(
+        "Extremely Liberal",
+        "Slightly Liberal",
+        "Liberal",
+        "Moderate",
+        "Slightly Conservative",
+        "Conservative",
+        "Extremely Conservative"
+      )
+    ),
+
+    party_reg_pre = factor(
+      party_reg_pre,
+      levels = c(1, 2, 4, 5),
+      labels = c(
+        "Democratic Party",
+        "Republican  Party",
+        "None/ Independent",
+        "Other Party"
+      )
+    ),
+
+    race = factor(
+      race,
+      levels = 1:6,
+      labels = c(
+        "White, non Hispanic",
+        "Black, non Hispanic",
+        "Hispanic",
+        "Asian/ Pacific Islander, non-Hispanic",
+        "Native American/Alaska Native or other 
+        race,Non Hispanic",
+        "Multiple races"
+      )
+    )
+  )
+```
+
+
+**Do we need to remove the obsrevations that do not have a cluster that is usable because they do not have a final cluster code?**
+
+```{r}
+lapply(
+  model.frame(mod1.1)[
+    c("gender", "year", "ideology_pre", "party_reg_pre", "race")
+  ],
+  levels
+)
+```
+
+
+```{r}
+mod1.1 <- lmer(trump_ft_post ~ gender+ year + ideology_pre + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_labels_clean)
+summary(mod1.1)
+
+```
+
+
+### Analysis 
+
+Intercept $\hat{\beta}_0$:
+
+Female $\hat{\beta}_1$:
+
+Other Gender $\hat{\beta}_2$:
+
+Year 2020 $\hat{\beta}_3$:
+
+Year 2024 $\hat{\beta}_4$:
+
+Liberal $\hat{\beta}_5$:
+
+Slightly Liberal $\hat{\beta}_6$:
+
+Moderate $\hat{\beta}_7$:
+
+Slightly Conservative $\hat{\beta}_8$:
+
+Conservative $\hat{\beta}_9$:
+
+Extremely Conservative $\hat{\beta}_{10}$:
+
+Republican Party $\hat{\beta}_{11}$:
+
+None/Independent $\hat{\beta}_{12}$:
+
+Other Party $\hat{\beta}_{13}$:
+
+Black, non-Hispanic $\hat{\beta}_{14}$:
+
+Hispanic $\hat{\beta}_{15}$:
+
+Asian/Pacific Islander, non-Hispanic $\hat{\beta}_{16}$:
+
+Native American/Alaska Native or Other Race $\hat{\beta}_{17}$:
+
+Multiple Races $\hat{\beta}_{18}$:
+
+
+### Ideology continous 
+
+```{r}
+
+anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
+  mutate(
+    ideology_c = ideology_cont - 1
+  )
+
+mod1.2 <- lmer(trump_ft_post ~ gender+ year + ideology_cont + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_labels_clean)
+
+summary (mod1.2)
+```
+
+
+## LRT testing 
+**ASk Brady what to do when the cluster varible used is missing. We use final cluster to connect all three waves to the same perons**
+**should cluster code be for the indivdual or by the observation I thought it should be for all**
+
+### LRT comapring rnadom intercepts
+```{r}
+sum(is.na(anes_ex_labels_clean$V160001_orig))
+sum(is.na(anes_ex_labels_clean$cluster_full))
+
+anes_ex_labels_clean <- anes_ex_labels_clean %>%
+  filter(!is.na(cluster_full))
+
+lmerTest::ranova(mod1.1)
+
+lmerTest::ranova(mod1.2)
+
+
+```
+
+```{r}
+mod1.1_1 <- lmer(trump_ft_post ~ gender+ year + ideology_pre + party_reg_pre + race  + (1|V160001_orig), data = anes_ex_labels_clean)
+summary(mod1.1_1)
+
+mod1.1_2 <- gls(
+  trump_ft_post ~ gender + year + ideology_pre +
+    party_reg_pre + race,
+  data = anes_ex_labels_clean,
+  na.action = "na.omit"
+)
+
+
+nobs(mod1.1_1)
+nobs(mod1.1_2)
+
+LRT <- -2 * (
+  as.numeric(logLik(mod1.1_2)) -
+  as.numeric(logLik(mod1.1_1))
+)
+
+pvalue <- 0.5 * pchisq(LRT, df = 1, lower.tail = FALSE)
+
+LRT
+pvalue
+
+
 ```
 
