@@ -505,9 +505,223 @@ ggplot(anes_freq_20, aes(
 
 ## Tabulate Missingness 
 ```{r}
-anes_long_miss
+library(dplyr)
+
+# Summarize missingness and invalid values by election year
+missing_by_year <- anes_long_1 %>%
+  group_by(year) %>%
+  summarise(
+    total_rows = n(),
+
+    valid_ft = sum(between(trump_ft_post, 0, 100),
+                   na.rm = TRUE),
+
+    ideology_99 = sum(ideology_pre == 99, na.rm = TRUE),
+
+    invalid_ideology = sum(
+      !ideology_pre %in% 1:7 | is.na(ideology_pre)
+    ),
+
+    party_inapplicable = sum(
+      party_reg_pre == -1, na.rm = TRUE
+    ),
+
+    invalid_party = sum(
+      !party_reg_pre %in% c(1, 2, 4, 5) |
+        is.na(party_reg_pre)
+    ),
+
+    invalid_gender = sum(
+      !gender %in% c(1, 2) | is.na(gender)
+    ),
+
+    invalid_race = sum(
+      !race %in% 1:6 | is.na(race)
+    ),
+
+    .groups = "drop"
+  )
+
+missing_by_year
 ```
 
+```{r}
+# Check special response codes for ideology
+anes_long_1 %>%
+  count(year, ideology_pre)
+
+# Check special response codes for party registration
+anes_long_1 %>%
+  count(year, party_reg_pre)
+
+# Check interview completion status
+anes_long_1 %>%
+  count(year, completion_status)
+```
+
+```{r}
+# Sequential Sample Loss
+
+# Apply filtering conditions step by step
+sample_loss <- anes_long_1 %>%
+  mutate(
+    step0 = TRUE,
+    step1 = between(trump_ft_post, 0, 100),
+    step2 = step1 & ideology_pre %in% 1:7,
+    step3 = step2 & party_reg_pre %in% c(1, 2, 4, 5),
+    step4 = step3 & gender %in% c(1, 2, 3),
+    step5 = step4 & race %in% 1:6
+  ) %>%
+  select(year, step0:step5) %>%
+  pivot_longer(
+    cols = -year,
+    names_to = "step",
+    values_to = "keep"
+  ) %>%
+  group_by(year, step) %>%
+  summarise(
+    n_remaining = sum(keep, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(year, step) %>%
+  group_by(year) %>%
+  mutate(
+    n_lost = lag(n_remaining, default = first(n_remaining)) -
+      n_remaining,
+    retention_pct = round(
+      100 * n_remaining / first(n_remaining), 1
+    )
+  ) %>%
+  ungroup()
+
+sample_loss
+```
+
+```{r}
+# Compare Excluding vs. Keeping Ideology 99
+
+# Scenario A: Exclude ideology = 99
+sample_no99 <- anes_long_1 %>%
+  filter(
+    between(trump_ft_post, 0, 100),
+    ideology_pre %in% 1:7,
+    party_reg_pre %in% c(1, 2, 4, 5),
+    gender %in% c(1, 2, 3),
+    race %in% 1:6
+  )
+
+# Scenario B: Keep ideology = 99
+sample_with99 <- anes_long_1 %>%
+  filter(
+    between(trump_ft_post, 0, 100),
+    ideology_pre %in% c(1:7, 99),
+    party_reg_pre %in% c(1, 2, 4, 5),
+    gender %in% c(1, 2, 3),
+    race %in% 1:6
+  )
+
+# Compare sample size by year
+ideology_comparison <- bind_rows(
+  sample_no99 %>% mutate(scenario = "Exclude 99"),
+  sample_with99 %>% mutate(scenario = "Keep 99")
+) %>%
+  group_by(scenario, year) %>%
+  summarise(
+    n_obs = n(),
+    n_respondents = n_distinct(V160001_orig),
+    .groups = "drop"
+  )
+
+ideology_comparison
+
+# Compare overall sample size
+ideology_total <- bind_rows(
+  sample_no99 %>% mutate(scenario = "Exclude 99"),
+  sample_with99 %>% mutate(scenario = "Keep 99")
+) %>%
+  group_by(scenario) %>%
+  summarise(
+    n_obs = n(),
+    n_respondents = n_distinct(V160001_orig),
+    .groups = "drop"
+  )
+
+ideology_total
+```
+
+```{r}
+# Treat ideology = 99 as a separate labeled category
+sample_with99 <- sample_with99 %>%
+  mutate(
+    ideology_cat = factor(
+      ideology_pre,
+      levels = c(1:7, 99),
+      labels = c(
+        "Extremely liberal",
+        "Liberal",
+        "Slightly liberal",
+        "Moderate",
+        "Slightly conservative",
+        "Conservative",
+        "Extremely conservative",
+        "Haven't thought much"
+      )
+    )
+  )
+
+# Check category frequencies by year
+sample_with99 %>%
+  count(year, ideology_cat)
+```
+
+```{r}
+# Longitudinal Observation Patterns
+
+# Count usable waves for each respondent
+wave_patterns <- anes_long_1 %>%
+  group_by(V160001_orig) %>%
+  summarise(
+    # Waves with valid Trump FT scores
+    n_valid_ft = sum(
+      between(trump_ft_post, 0, 100),
+      na.rm = TRUE
+    ),
+
+    # Waves available for the model excluding ideology 99
+    n_model_no99 = sum(
+      between(trump_ft_post, 0, 100) &
+        ideology_pre %in% 1:7 &
+        party_reg_pre %in% c(1, 2, 4, 5) &
+        gender %in% c(1, 2, 3) &
+        race %in% 1:6,
+      na.rm = TRUE
+    ),
+
+    # Waves available for the model keeping ideology 99
+    n_model_with99 = sum(
+      between(trump_ft_post, 0, 100) &
+        ideology_pre %in% c(1:7, 99) &
+        party_reg_pre %in% c(1, 2, 4, 5) &
+        gender %in% c(1, 2, 3) &
+        race %in% 1:6,
+      na.rm = TRUE
+    ),
+
+    .groups = "drop"
+  )
+
+# Valid outcome waves
+wave_patterns %>%
+  count(n_valid_ft, name = "n_respondents")
+
+# Model-eligible waves: excluding 99
+wave_patterns %>%
+  count(n_model_no99, name = "n_respondents")
+
+# Model-eligible waves: keeping 99
+wave_patterns %>%
+  count(n_model_with99, name = "n_respondents")
+```
 
 
 ## Clean Varibles
