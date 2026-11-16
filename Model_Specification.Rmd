@@ -109,7 +109,7 @@ anes_ex_labels_clean <- anes_ex_labels %>%
 ```
 
 
-**Do we need to remove the obsrevations that do not have a cluster that is usable because they do not have a final cluster code?**
+**Do we need to remove the observations that do not have a cluster that is usable because they do not have a final cluster code?**
 
 ```{r}
 lapply(
@@ -173,12 +173,19 @@ Multiple Races $\hat{\beta}_{18}$:
 
 ```{r}
 
+anes_ex_id_cont_clean <- anes_ex_labels_clean %>%
+  mutate(
+    ideology_cont = as.numeric(ideology_pre)
+  ) %>%
+  select(-ideology_pre)
+
+
 anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
   mutate(
     ideology_c = ideology_cont - 1
   )
 
-mod1.2 <- lmer(trump_ft_post ~ gender+ year + ideology_cont + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_labels_clean)
+mod1.2 <- lmer(trump_ft_post ~ gender+ year + ideology_cont + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
 
 summary (mod1.2)
 ```
