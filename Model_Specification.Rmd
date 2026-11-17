@@ -111,6 +111,13 @@ anes_ex_labels_clean <- anes_ex_labels %>%
 
 **Do we need to remove the observations that do not have a cluster that is usable because they do not have a final cluster code?**
 
+
+```{r}
+mod1.1 <- lmer(trump_ft_post ~ gender+ year + ideology_pre + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_labels_clean)
+summary(mod1.1)
+
+```
+
 ```{r}
 lapply(
   model.frame(mod1.1)[
@@ -118,13 +125,7 @@ lapply(
   ],
   levels
 )
-```
-
-
-```{r}
-mod1.1 <- lmer(trump_ft_post ~ gender+ year + ideology_pre + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_labels_clean)
 summary(mod1.1)
-
 ```
 
 
@@ -187,7 +188,7 @@ anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
 
 mod1.2 <- lmer(trump_ft_post ~ gender+ year + ideology_cont + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
 
-summary (mod1.2)
+summary(mod1.2)
 ```
 
 
@@ -237,4 +238,12 @@ pvalue
 
 
 ```
+# Random Slopes model
+```{r}
+slopes_mod <- lmer(trump_ft_post ~ gender + as.numeric(year) + ideology_pre + party_reg_pre + race  + (1+year|year), data = anes_ex_labels_clean)
 
+summary(slopes_mod)
+
+lmerTest::ranova(slopes_mod)
+
+```
