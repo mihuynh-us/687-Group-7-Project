@@ -211,33 +211,6 @@ lmerTest::ranova(mod1.2)
 
 ```
 
-```{r}
-mod1.1_1 <- lmer(trump_ft_post ~ gender+ year + ideology_pre + party_reg_pre + race  + (1|V160001_orig), data = anes_ex_labels_clean)
-summary(mod1.1_1)
-
-mod1.1_2 <- gls(
-  trump_ft_post ~ gender + year + ideology_pre +
-    party_reg_pre + race,
-  data = anes_ex_labels_clean,
-  na.action = "na.omit"
-)
-
-
-nobs(mod1.1_1)
-nobs(mod1.1_2)
-
-LRT <- -2 * (
-  as.numeric(logLik(mod1.1_2)) -
-  as.numeric(logLik(mod1.1_1))
-)
-
-pvalue <- 0.5 * pchisq(LRT, df = 1, lower.tail = FALSE)
-
-LRT
-pvalue
-
-
-```
 # Random Slopes model
 ```{r}
 slopes_mod <- lmer(trump_ft_post ~ gender + as.numeric(year) + ideology_pre + party_reg_pre + race  + (1+year|year), data = anes_ex_labels_clean)
