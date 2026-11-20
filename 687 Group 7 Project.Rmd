@@ -125,6 +125,11 @@ anes_selected <- anes_panel_full %>%
     V161019,        # 2016
     V201018,        # 2020
     V241025,        # 2024
+    
+    # PRE Party Identification (7-point summary)
+    V161158x,       # 2016
+    V201231x,       # 2020
+    V241227x,       # 2024
 
     # Race / Ethnicity
     V161310x,       # 2016
@@ -221,6 +226,11 @@ anes_long <- anes_selected %>%
     party_reg_pre_2016 = V161019,
     party_reg_pre_2020 = V201018,
     party_reg_pre_2024 = V241025,
+    
+    # PRE Party Identification (7-point summary)
+    party_id_pre_2016 = V161158x,
+    party_id_pre_2020 = V201231x,
+    party_id_pre_2024 = V241227x,
 
     # Race / Ethnicity
     race_2016 = V161310x,
