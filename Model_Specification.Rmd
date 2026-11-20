@@ -18,7 +18,6 @@ library(tidyr)
 library(lme4)
 ```
 
-
 # load data
 ```{r}
 anes_panel_full <- read_csv(
@@ -37,8 +36,10 @@ anes_ex_labels <- anes_panel_full %>%
     gender = replace(gender, gender %in% c(-9), NA),
     race = replace(race, race %in% c(-2), NA),
     ideology_pre = replace(ideology_pre, ideology_pre %in% c(-8, -9), NA),
-    party_reg_pre = replace(party_reg_pre, party_reg_pre %in% c(-1, -8, -9), NA),
+    party_id_pre = replace(party_id_pre, party_id_pre %in% c(-4,-8,-9), NA),
+    party_reg_pre = replace(party_reg_pre, party_reg_pre %in% c( -8, -9), NA),
   )
+
 
 #with extra labels 
 anes_in_labels <- anes_panel_full %>%
@@ -49,6 +50,7 @@ anes_in_labels <- anes_panel_full %>%
     party_reg_pre = replace(party_reg_pre, party_reg_pre %in% c(-1, -8, -9), NA),
   )
 ```
+
 
 ## Change labels for the data
 
@@ -80,11 +82,13 @@ anes_ex_labels_clean <- anes_ex_labels %>%
         "Extremely Conservative"
       )
     ),
+    
 
     party_reg_pre = factor(
       party_reg_pre,
-      levels = c(1, 2, 4, 5),
+      levels = c(-1,1, 2, 4, 5),
       labels = c(
+        "No Party reg in state",
         "Democratic Party",
         "Republican  Party",
         "None/ Independent",
@@ -106,6 +110,41 @@ anes_ex_labels_clean <- anes_ex_labels %>%
       )
     )
   )
+
+anes_ex_labels_clean$party_reg_pre <- relevel(anes_ex_labels_clean$party_reg_pre, ref = "Democratic Party")
+```
+
+```{r}
+
+anes_ex_id_cont_clean <- anes_ex_labels_clean %>%
+  mutate(
+    ideology_cont = as.numeric(ideology_pre)
+  ) %>%
+  select(-ideology_pre)
+
+
+anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
+  mutate(
+    ideology_c = ideology_cont - 1
+  )
+
+
+anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
+  mutate(
+    party_id_pre_cont = as.numeric(party_id_pre)
+  ) %>%
+  select(-party_id_pre)
+
+
+anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
+  mutate(
+    party_id_pre_c = party_id_pre_cont - 1
+  )
+
+anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
+  mutate(
+    trump_ft_post_c = trump_ft_post - 50
+  )
 ```
 
 
@@ -113,15 +152,22 @@ anes_ex_labels_clean <- anes_ex_labels %>%
 
 
 ```{r}
-mod1.1 <- lmer(trump_ft_post ~ gender+ year + ideology_pre + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_labels_clean)
-summary(mod1.1)
+
+mod1.1 <- lmer(trump_ft_post ~ gender+ year+ party_reg_pre + party_id_pre_c+ ideology_c+race +  (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
+
+summary(mod1.2)
+
+mod1.2 <- lmer(trump_ft_post ~ gender+ year + party_id_pre_c+ ideology_c+ party_reg_pre +race+ race*gender  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
+
+summary(mod1.2)
+
 
 ```
 
 ```{r}
 lapply(
   model.frame(mod1.1)[
-    c("gender", "year", "ideology_pre", "party_reg_pre", "race")
+    c("gender", "year", "party_reg_pre", "race")
   ],
   levels
 )
@@ -174,19 +220,7 @@ Multiple Races $\hat{\beta}_{18}$:
 
 ```{r}
 
-anes_ex_id_cont_clean <- anes_ex_labels_clean %>%
-  mutate(
-    ideology_cont = as.numeric(ideology_pre)
-  ) %>%
-  select(-ideology_pre)
-
-
-anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
-  mutate(
-    ideology_c = ideology_cont - 1
-  )
-
-mod1.2 <- lmer(trump_ft_post ~ gender+ year + ideology_cont + party_reg_pre + race  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
+mod1.2 <- lmer(trump_ft_post ~ gender+ year + ideology_cont + party_reg_pre + race  + gender*race (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
 
 summary(mod1.2)
 ```
@@ -198,10 +232,10 @@ summary(mod1.2)
 
 ### LRT comapring rnadom intercepts
 ```{r}
-sum(is.na(anes_ex_labels_clean$V160001_orig))
-sum(is.na(anes_ex_labels_clean$cluster_full))
+sum(is.na(anes_ex_id_cont_clean$V160001_orig))
+sum(is.na(anes_ex_id_cont_clean$cluster_full))
 
-anes_ex_labels_clean <- anes_ex_labels_clean %>%
+anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
   filter(!is.na(cluster_full))
 
 lmerTest::ranova(mod1.1)
