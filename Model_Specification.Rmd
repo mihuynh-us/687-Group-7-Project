@@ -175,35 +175,77 @@ lapply(
 #### Fixed Effects (
 Intercept $\hat{\beta}_0$:The estimated fixed intercept of -1.9483 represents an expected Trump feeling thermometer score approximately 1.95 points below 50, or 48.05 on the original 0–100 scale, for an individual in all reference categories in 2016, with party identification and ideology at their centered values and random effects equal to zero.
 
-Female $\hat{\beta}_1$:The estimated coefficient of -0.1344 indicates that females have an expected centered Trump feeling thermometer score approximately 0.13 points lower than males, holding all other variables constant.
+Female $\hat{\beta}_1$:
 
-Other Gender $\hat{\beta}_2$:The estimated coefficient of -21.0326 indicates that individuals identifying as another gender have an expected Trump feeling thermometer score approximately 21.03 points lower than males, holding all other variables constant.
+The estimated coefficient of -0.1344 indicates that females have an expected centered Trump feeling thermometer score approximately 0.13 points lower than males. However, this difference is not statistically significant ($t=-0.156$).
 
-Year 2020 $\hat{\beta}_3$: The estimated coefficient of -2.5742 indicates that the expected Trump feeling thermometer score in 2020 is approximately 2.57 points lower than in 2016, holding all other variables constant.
+Other Gender $\hat{\beta}_2$:
 
-Year 2024 $\hat{\beta}_4$:The estimated coefficient of -1.9625 indicates that the expected Trump feeling thermometer score in 2024 is approximately 1.96 points lower than in 2016, holding all other variables constant.
+The estimated coefficient of -21.0326 indicates that individuals identifying as another gender have an expected Trump feeling thermometer score approximately 21.03 points lower than males. However, this difference is not statistically significant ($t=-1.431$).
 
-No party Reg in state $\hat{\beta}_5$:The estimated coefficient of 0.9106 indicates that individuals living in states without party registration have an expected Trump feeling thermometer score approximately 0.91 points higher than individuals registered as Democrats, holding all other variables constant.
 
-Republican $\hat{\beta}_6$:The estimated coefficient of 2.3665 indicates that individuals registered as Republicans have an expected Trump feeling thermometer score approximately 2.37 points higher than registered Democrats, holding all other variables constant.
+Year 2020 $\hat{\beta}_3$: 
 
-non/independent $\hat{\beta}_7$:The estimated coefficient of -0.6846 indicates that individuals registered as independent or with no party have an expected Trump feeling thermometer score approximately 0.68 points lower than registered Democrats, holding all other variables constant.
+The estimated coefficient of -2.5742 indicates that the expected Trump feeling thermometer score in 2020 is approximately 2.57 points lower than in 2016. This difference is statistically significant ($t=-4.218$).
 
-other party $\hat{\beta}_8$: The estimated coefficient of 0.8645 indicates that individuals registered with another political party have an expected Trump feeling thermometer score approximately 0.86 points higher than registered Democrats, holding all other variables constant.
 
-party ID $\hat{\beta}_9$:The estimated coefficient of 8.4150 indicates that for each one-unit increase in centered party identification, the expected Trump feeling thermometer score increases by approximately 8.42 points, holding all other variables constant.
+Year 2024 $\hat{\beta}_4$:
 
-Ideolgy  $\hat{\beta}_{10}$: The estimated coefficient of 5.6331 indicates that for each one-unit increase in centered ideology, moving from liberal toward conservative, the expected Trump feeling thermometer score increases by approximately 5.63 points, holding all other variables constant.
+The estimated coefficient of -1.9625 indicates that the expected Trump feeling thermometer score in 2024 is approximately 1.96 points lower than in 2016. This difference is statistically significant ($t=-3.237$).
 
-Black, non-Hispanic $\hat{\beta}_{11}$:The estimated coefficient of -1.9870 indicates that Black, non-Hispanic individuals have an expected Trump feeling thermometer score approximately 1.99 points lower than White, non-Hispanic individuals, holding all other variables constant.
 
-Hispanic $\hat{\beta}_{12}$:The estimated coefficient of -3.2422 indicates that Hispanic individuals have an expected Trump feeling thermometer score approximately 3.24 points lower than White, non-Hispanic individuals, holding all other variables constant.
+No party Reg in state $\hat{\beta}_5$:
 
-Asian/Pacific Islander, non-Hispanic $\hat{\beta}_{13}$: The estimated coefficient of 0.5030 indicates that Asian/Pacific Islander, non-Hispanic individuals have an expected Trump feeling thermometer score approximately 0.50 points higher than White, non-Hispanic individuals, holding all other variables constant.
+The estimated coefficient of 0.9106 indicates that individuals living in states without party registration have an expected Trump feeling thermometer score approximately 0.91 points higher than individuals registered as Democrats. However, this difference is not statistically significant ($t=0.834$).
 
-Native American/Alaska Native or Other Race $\hat{\beta}_{14}$:The estimated coefficient of 4.3586 indicates that Native American/Alaska Native or other race individuals have an expected Trump feeling thermometer score approximately 4.36 points higher than White, non-Hispanic individuals, holding all other variables constant.
 
-Multiple Races $\hat{\beta}_{15}$:The estimated coefficient of -0.4600 indicates that individuals identifying with multiple races have an expected Trump feeling thermometer score approximately 0.46 points lower than White, non-Hispanic individuals, holding all other variables constant.
+Republican $\hat{\beta}_6$:
+
+The estimated coefficient of 2.3665 indicates that individuals registered as Republicans have an expected Trump feeling thermometer score approximately 2.37 points higher than registered Democrats. However, this difference is not statistically significant ($t=1.661$).
+
+
+non/independent $\hat{\beta}_7$:
+
+The estimated coefficient of -0.6846 indicates that individuals registered as independent or with no party have an expected Trump feeling thermometer score approximately 0.68 points lower than registered Democrats. However, this difference is not statistically significant ($t=-0.523$).
+
+
+other party $\hat{\beta}_8$: 
+
+The estimated coefficient of 0.8645 indicates that individuals registered with another political party have an expected Trump feeling thermometer score approximately 0.86 points higher than registered Democrats. However, this difference is not statistically significant ($t=0.189$).
+
+party ID $\hat{\beta}_9$:
+
+The estimated coefficient of 8.4150 indicates that for each one-unit increase in centered party identification toward Republican identification, the expected Trump feeling thermometer score increases by approximately 8.42 points. This positive association is statistically significant ($t=32.882$).
+
+
+Ideolgy  $\hat{\beta}_{10}$:
+
+The estimated coefficient of 5.6331 indicates that for each one-unit increase in centered ideology, moving from liberal toward conservative, the expected Trump feeling thermometer score increases by approximately 5.63 points. This positive association is statistically significant ($t=18.219$).
+
+
+Black, non-Hispanic $\hat{\beta}_{11}$:
+
+
+The estimated coefficient of -1.9870 indicates that Black, non-Hispanic individuals have an expected Trump feeling thermometer score approximately 1.99 points lower than White, non-Hispanic individuals. However, this difference is not statistically significant ($t=-1.160$).
+
+
+Hispanic $\hat{\beta}_{12}$:
+
+The estimated coefficient of -3.2422 indicates that Hispanic individuals have an expected Trump feeling thermometer score approximately 3.24 points lower than White, non-Hispanic individuals. This difference is approximately statistically significant at the 0.05 level ($t=-2.091$).
+
+
+Asian/Pacific Islander, non-Hispanic $\hat{\beta}_{13}$:
+
+The estimated coefficient of 0.5030 indicates that Asian/Pacific Islander, non-Hispanic individuals have an expected Trump feeling thermometer score approximately 0.50 points higher than White, non-Hispanic individuals. However, this difference is not statistically significant ($t=0.211$).
+
+
+Native American/Alaska Native or Other Race $\hat{\beta}_{14}$:
+
+The estimated coefficient of 4.3586 indicates that Native American/Alaska Native or other race individuals have an expected Trump feeling thermometer score approximately 4.36 points higher than White, non-Hispanic individuals. However, this difference is not statistically significant ($t=1.426$).
+
+Multiple Races $\hat{\beta}_{15}$:
+
+The estimated coefficient of -0.4600 indicates that individuals identifying with multiple races have an expected Trump feeling thermometer score approximately 0.46 points lower than White, non-Hispanic individuals. However, this difference is not statistically significant ($t=-0.238$).
 
 #### Varaince compenents 
 
