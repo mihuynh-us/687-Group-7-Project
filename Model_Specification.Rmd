@@ -155,7 +155,7 @@ anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
 
 mod1.1 <- lmer(trump_ft_post ~ gender+ year+ party_reg_pre + party_id_pre_c+ ideology_c+race +  (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
 
-summary(mod1.2)
+summary(mod1.1)
 
 mod1.2 <- lmer(trump_ft_post ~ gender+ year + party_id_pre_c+ ideology_c+ party_reg_pre +race+ race*gender  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
 
