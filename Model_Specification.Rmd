@@ -150,7 +150,7 @@ anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
 
 **Do we need to remove the observations that do not have a cluster that is usable because they do not have a final cluster code?**
 
-## Model 1 No interactiosn
+## Model 1 No interactions
 ```{r}
 
 #model1 no interactions
