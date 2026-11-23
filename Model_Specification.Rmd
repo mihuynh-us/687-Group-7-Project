@@ -150,87 +150,152 @@ anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
 
 **Do we need to remove the observations that do not have a cluster that is usable because they do not have a final cluster code?**
 
-
+## Model 1 No interactiosn
 ```{r}
 
+#model1 no interactions
 mod1.1 <- lmer(trump_ft_post ~ gender+ year+ party_reg_pre + party_id_pre_c+ ideology_c+race +  (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
 
 summary(mod1.1)
 
-mod1.2 <- lmer(trump_ft_post ~ gender+ year + party_id_pre_c+ ideology_c+ party_reg_pre +race+ race*gender  + (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
-
-summary(mod1.2)
-
-
-```
-
-```{r}
+# Check Levels
 lapply(
   model.frame(mod1.1)[
     c("gender", "year", "party_reg_pre", "race")
   ],
   levels
 )
-summary(mod1.1)
+
 ```
 
 
-### Analysis 
 
-Intercept $\hat{\beta}_0$:
+### Analysis (no interactions)
 
-Female $\hat{\beta}_1$:
+#### Fixed Effects (
+Intercept $\hat{\beta}_0$:The estimated fixed intercept of -1.9483 represents an expected Trump feeling thermometer score approximately 1.95 points below 50, or 48.05 on the original 0–100 scale, for an individual in all reference categories in 2016, with party identification and ideology at their centered values and random effects equal to zero.
 
-Other Gender $\hat{\beta}_2$:
+Female $\hat{\beta}_1$:The estimated coefficient of -0.1344 indicates that females have an expected centered Trump feeling thermometer score approximately 0.13 points lower than males, holding all other variables constant.
 
-Year 2020 $\hat{\beta}_3$:
+Other Gender $\hat{\beta}_2$:The estimated coefficient of -21.0326 indicates that individuals identifying as another gender have an expected Trump feeling thermometer score approximately 21.03 points lower than males, holding all other variables constant.
 
-Year 2024 $\hat{\beta}_4$:
+Year 2020 $\hat{\beta}_3$: The estimated coefficient of -2.5742 indicates that the expected Trump feeling thermometer score in 2020 is approximately 2.57 points lower than in 2016, holding all other variables constant.
 
-Liberal $\hat{\beta}_5$:
+Year 2024 $\hat{\beta}_4$:The estimated coefficient of -1.9625 indicates that the expected Trump feeling thermometer score in 2024 is approximately 1.96 points lower than in 2016, holding all other variables constant.
 
-Slightly Liberal $\hat{\beta}_6$:
+No party Reg in state $\hat{\beta}_5$:The estimated coefficient of 0.9106 indicates that individuals living in states without party registration have an expected Trump feeling thermometer score approximately 0.91 points higher than individuals registered as Democrats, holding all other variables constant.
 
-Moderate $\hat{\beta}_7$:
+Republican $\hat{\beta}_6$:The estimated coefficient of 2.3665 indicates that individuals registered as Republicans have an expected Trump feeling thermometer score approximately 2.37 points higher than registered Democrats, holding all other variables constant.
 
-Slightly Conservative $\hat{\beta}_8$:
+non/independent $\hat{\beta}_7$:The estimated coefficient of -0.6846 indicates that individuals registered as independent or with no party have an expected Trump feeling thermometer score approximately 0.68 points lower than registered Democrats, holding all other variables constant.
 
-Conservative $\hat{\beta}_9$:
+other party $\hat{\beta}_8$: The estimated coefficient of 0.8645 indicates that individuals registered with another political party have an expected Trump feeling thermometer score approximately 0.86 points higher than registered Democrats, holding all other variables constant.
 
-Extremely Conservative $\hat{\beta}_{10}$:
+party ID $\hat{\beta}_9$:The estimated coefficient of 8.4150 indicates that for each one-unit increase in centered party identification, the expected Trump feeling thermometer score increases by approximately 8.42 points, holding all other variables constant.
 
-Republican Party $\hat{\beta}_{11}$:
+Ideolgy  $\hat{\beta}_{10}$: The estimated coefficient of 5.6331 indicates that for each one-unit increase in centered ideology, moving from liberal toward conservative, the expected Trump feeling thermometer score increases by approximately 5.63 points, holding all other variables constant.
 
-None/Independent $\hat{\beta}_{12}$:
+Black, non-Hispanic $\hat{\beta}_{11}$:The estimated coefficient of -1.9870 indicates that Black, non-Hispanic individuals have an expected Trump feeling thermometer score approximately 1.99 points lower than White, non-Hispanic individuals, holding all other variables constant.
 
-Other Party $\hat{\beta}_{13}$:
+Hispanic $\hat{\beta}_{12}$:The estimated coefficient of -3.2422 indicates that Hispanic individuals have an expected Trump feeling thermometer score approximately 3.24 points lower than White, non-Hispanic individuals, holding all other variables constant.
 
-Black, non-Hispanic $\hat{\beta}_{14}$:
+Asian/Pacific Islander, non-Hispanic $\hat{\beta}_{13}$: The estimated coefficient of 0.5030 indicates that Asian/Pacific Islander, non-Hispanic individuals have an expected Trump feeling thermometer score approximately 0.50 points higher than White, non-Hispanic individuals, holding all other variables constant.
 
-Hispanic $\hat{\beta}_{15}$:
+Native American/Alaska Native or Other Race $\hat{\beta}_{14}$:The estimated coefficient of 4.3586 indicates that Native American/Alaska Native or other race individuals have an expected Trump feeling thermometer score approximately 4.36 points higher than White, non-Hispanic individuals, holding all other variables constant.
 
-Asian/Pacific Islander, non-Hispanic $\hat{\beta}_{16}$:
+Multiple Races $\hat{\beta}_{15}$:The estimated coefficient of -0.4600 indicates that individuals identifying with multiple races have an expected Trump feeling thermometer score approximately 0.46 points lower than White, non-Hispanic individuals, holding all other variables constant.
 
-Native American/Alaska Native or Other Race $\hat{\beta}_{17}$:
+#### Varaince compenents 
 
-Multiple Races $\hat{\beta}_{18}$:
+Individual Random Intercept Variance:
+
+Individual Random Intercept Variance: The estimated individual random intercept variance is 282.29, representing the variability between individuals in their expected Trump feeling thermometer scores after accounting for the fixed effects. This indicates that individuals vary considerably in their underlying intercepts, rather than all having the same expected score. The estimated standard deviation of 16.80 indicates substantial variation in individual intercepts around the fixed-effects prediction.
 
 
-### Ideology continous 
+Cluster Random Intercept Variance: The estimated cluster random intercept variance is 0.67, representing the variability between clusters in their expected Trump feeling thermometer scores after accounting for the fixed effects and individual random intercepts. The estimated standard deviation is 0.82, indicating that relatively little variation remains between clusters compared with the variation between individuals.
 
+Residual Variance:Lastly, the estimated residual variance is 322.77, representing the remaining within-individual variability in Trump feeling thermometer scores across observations that is not explained by the fixed effects or random intercepts in the model.
+
+Overall, the model indicates that substantial variation remains between individuals and within individuals across observations, while relatively little variation is attributable to differences between clusters. The fixed effects for year indicate that expected Trump feeling thermometer scores were lower in 2020 and 2024 compared with 2016, after accounting for the other predictors.
+
+
+
+
+### Model 2 With interactiosn
 ```{r}
 
-mod1.2 <- lmer(trump_ft_post ~ gender+ year + ideology_cont + party_reg_pre + race  + gender*race (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
+#model1 no interactions
+mod1.2 <- lmer(
+  trump_ft_post ~ gender * party_id_pre_c +
+    year + party_reg_pre + ideology_c + race +
+    (1 | V160001_orig) + (1 | cluster_full),
+  data = anes_ex_id_cont_clean
+)
 
 summary(mod1.2)
+
+
+mod1.3 <- lmer(
+  trump_ft_post ~ race * party_id_pre_c +
+    gender + year + party_reg_pre + ideology_c +
+    (1 | V160001_orig) + (1 | cluster_full),
+  data = anes_ex_id_cont_clean
+)
+
+summary(mod1.3)
+
 ```
 
+```{r}
+mod1.4 <- lmer(
+  trump_ft_post ~ party_id_pre_c * gender * race * ideology_c +
+    year + party_reg_pre +
+    (1 | V160001_orig) + (1 | cluster_full),
+  data = anes_ex_id_cont_clean
+)
+
+summary(mod1.4)
+```
+
+## Model comparision 
+
+```{r}
+mod1.1_ml <- update(mod1.1, REML = FALSE)
+mod1.4_ml <- update(mod1.4, REML = FALSE)
+
+anova(mod1.1_ml, mod1.4_ml)
+```
+
+```{r}
+cor(
+  anes_ex_id_cont_clean$party_id_pre_c,
+  anes_ex_id_cont_clean$ideology_c,
+  use = "complete.obs"
+)
+
+library(performance)
+
+check_collinearity(mod1.1)
+check_collinearity(mod1.4)
+```
+
+
+A likelihood ratio test was conducted to compare Model 1.1, which included only main effects, with Model 1.4, which included interactions between party identification and gender, race, and ideology. The results indicated that Model 1.4 provided a statistically significant improvement in model fit, $\chi^2(8) = 56.248$, $p < 0.001$. This suggests that including the interaction terms significantly improved model fit compared to the main-effects model.
+
+The AIC decreased from 50,502 in Model 1.1 to 50,462 in Model 1.4, indicating that Model 1.4 provided a better balance between model fit and complexity according to the AIC criterion. However, the BIC increased from 50,628 in Model 1.1 to 50,641 in Model 1.4, indicating that the simpler Model 1.1 was preferred under the BIC criterion due to its greater penalty for additional parameters.
+
+
+The issue with the fidnng sfr 1.4 is The correlation between party identification and political ideology was 0.751, indicating a strong positive relationship between the two predictors. This suggests that individuals who identify more strongly with the Republican Party also tend to identify as more conservative. Given this relationship, multicollinearity was examined using variance inflation factors (VIF).
+
+For Model 1.4, party identification had a VIF of 8.85, while ideology had a VIF of 3.58. The interaction between party identification and ideology had a VIF of 11.49, indicating elevated multicollinearity among the predictors. The model also produced high raw VIF values for gender, race, and their interactions with party identification, although the adjusted VIF values were substantially smaller for the categorical predictors.
+
+These findings suggest that multicollinearity should be considered when interpreting the individual regression coefficients and their standard errors. Although the likelihood ratio test and AIC favored Model 1.4 over Model 1.1, the BIC favored the simpler Model 1.1. Therefore, the improved fit of Model 1.4 must be considered alongside its additional complexity and potential multicollinearity when selecting the final model.
 
 ## LRT testing 
 **ASk Brady what to do when the cluster varible used is missing. We use final cluster to connect all three waves to the same perons**
-**should cluster code be for the indivdual or by the observation I thought it should be for all**
+**should cluster code be for the individual or by the observation I thought it should be for all**
 
-### LRT comapring rnadom intercepts
+### LRT comparing random intercepts
 ```{r}
 sum(is.na(anes_ex_id_cont_clean$V160001_orig))
 sum(is.na(anes_ex_id_cont_clean$cluster_full))
