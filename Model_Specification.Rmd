@@ -347,7 +347,7 @@ anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
 
 lmerTest::ranova(mod1.1)
 
-lmerTest::ranova(mod1.2)
+lmerTest::ranova(mod1.4)
 
 
 ```
