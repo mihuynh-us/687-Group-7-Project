@@ -324,8 +324,8 @@ anova(mod1.1_ml, mod1.4_ml)
 
 ```{r}
 cor(
-  anes_ex_id_cont_clean$party_id_pre_c,
-  anes_ex_id_cont_clean$ideology_c,
+  anes_ex_id_cont_clean$party_id_pre_cont,
+  anes_ex_id_cont_clean$ideology_cont,
   use = "complete.obs"
 )
 
