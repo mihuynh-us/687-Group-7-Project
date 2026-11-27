@@ -118,28 +118,10 @@ anes_ex_labels_clean$party_reg_pre <- relevel(anes_ex_labels_clean$party_reg_pre
 
 anes_ex_id_cont_clean <- anes_ex_labels_clean %>%
   mutate(
-    ideology_cont = as.numeric(ideology_pre)
+    ideology_cont = as.numeric(ideology_pre) - 1,
+    party_id_pre_cont = as.numeric(party_id_pre) - 1
   ) %>%
-  select(-ideology_pre)
-
-
-anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
-  mutate(
-    ideology_c = ideology_cont - 1
-  )
-
-
-anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
-  mutate(
-    party_id_pre_cont = as.numeric(party_id_pre)
-  ) %>%
-  select(-party_id_pre)
-
-
-anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
-  mutate(
-    party_id_pre_c = party_id_pre_cont - 1
-  )
+  select(-ideology_pre, -party_id_pre)
 
 anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
   mutate(
@@ -154,7 +136,7 @@ anes_ex_id_cont_clean <- anes_ex_id_cont_clean %>%
 ```{r}
 
 #model1 no interactions
-mod1.1 <- lmer(trump_ft_post ~ gender+ year+ party_reg_pre + party_id_pre_c+ ideology_c+race +  (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
+mod1.1 <- lmer(trump_ft_post ~ gender+ year+ party_reg_pre + party_id_pre_cont+ ideology_cont+race +  (1|V160001_orig) + (1|cluster_full), data = anes_ex_id_cont_clean)
 
 summary(mod1.1)
 
@@ -263,13 +245,13 @@ Overall, the model indicates that substantial variation remains between individu
 
 
 
-### Models 1.2 1.3 and 1.4 With interactiosn
+### Models 1.2 1.3 and 1.4 1.5 With interactiosn
 ```{r}
 
 #model1 no interactions
 mod1.2 <- lmer(
-  trump_ft_post ~ gender * party_id_pre_c +
-    year + party_reg_pre + ideology_c + race +
+  trump_ft_post ~ gender * party_id_pre_cont +
+    year + party_reg_pre + ideology_cont + race +
     (1 | V160001_orig) + (1 | cluster_full),
   data = anes_ex_id_cont_clean
 )
@@ -278,8 +260,8 @@ summary(mod1.2)
 
 
 mod1.3 <- lmer(
-  trump_ft_post ~ race * party_id_pre_c +
-    gender + year + party_reg_pre + ideology_c +
+  trump_ft_post ~ race * party_id_pre_cont +
+    gender + year + party_reg_pre + ideology_cont +
     (1 | V160001_orig) + (1 | cluster_full),
   data = anes_ex_id_cont_clean
 )
@@ -288,25 +270,57 @@ summary(mod1.3)
 
 ```
 
+
 ```{r}
+
 mod1.4 <- lmer(
-  trump_ft_post ~ party_id_pre_c * gender * race * ideology_c +
-    year + party_reg_pre +
+  trump_ft_post ~ gender * ideology_cont +
+    race + year + party_reg_pre  +party_id_pre_cont+
     (1 | V160001_orig) + (1 | cluster_full),
   data = anes_ex_id_cont_clean
 )
 
 summary(mod1.4)
+
+
+mod1.5 <- lmer(
+  trump_ft_post ~ race * ideology_cont +
+    gender + year + party_reg_pre  +party_id_pre_cont+
+    (1 | V160001_orig) + (1 | cluster_full),
+  data = anes_ex_id_cont_clean
+)
+
+summary(mod1.5)
+
 ```
+
 
 ## Model comparision 
 
 ```{r}
+
+mod1.1_ml <- update(mod1.1, REML = FALSE)
+mod1.5_ml <- update(mod1.5, REML = FALSE)
+
+anova(mod1.1_ml, mod1.5_ml)
+
+mod1.1_ml <- update(mod1.1, REML = FALSE)
+mod1.2_ml <- update(mod1.2, REML = FALSE)
+
+anova(mod1.1_ml, mod1.2_ml)
+
+mod1.1_ml <- update(mod1.1, REML = FALSE)
+mod1.3_ml <- update(mod1.3, REML = FALSE)
+
+anova(mod1.1_ml, mod1.3_ml)
+
 mod1.1_ml <- update(mod1.1, REML = FALSE)
 mod1.4_ml <- update(mod1.4, REML = FALSE)
 
 anova(mod1.1_ml, mod1.4_ml)
+
 ```
+
 
 ```{r}
 cor(
@@ -318,7 +332,7 @@ cor(
 library(performance)
 
 check_collinearity(mod1.1)
-check_collinearity(mod1.4)
+check_collinearity(mod1.5)
 ```
 
 
@@ -352,6 +366,9 @@ lmerTest::ranova(mod1.4)
 
 ```
 
+
+
+
 # Random Slopes model
 ```{r}
 slopes_mod <- lmer(trump_ft_post ~ gender + as.numeric(year) + ideology_pre + party_reg_pre + race  + (1+year|year), data = anes_ex_labels_clean)
@@ -361,3 +378,19 @@ summary(slopes_mod)
 lmerTest::ranova(slopes_mod)
 
 ```
+
+
+
+```{r}
+
+mod1.8 <- lmer(
+  trump_ft_post ~ party_id_pre_c * gender * race * ideology_c +
+    year + party_reg_pre +
+    (1 | V160001_orig) + (1 | cluster_full),
+  data = anes_ex_id_cont_clean
+)
+
+summary(mod1.)
+```
+
+
