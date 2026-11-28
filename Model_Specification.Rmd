@@ -394,3 +394,26 @@ summary(mod1.)
 ```
 
 
+
+# LRT for the fixed effects of election year
+```{r}
+analysis_data <- model.frame(mod1.1)
+
+# Full model with election year
+mod_year_full <- update(
+  mod1.1,
+  data = analysis_data,
+  REML = FALSE
+)
+
+# Reduced model without election year
+mod_year_reduced <- update(
+  mod_year_full,
+  . ~ . - year
+)
+
+# Likelihood ratio test
+anova(mod_year_reduced, mod_year_full)
+```
+
+
